@@ -13,7 +13,16 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     try:
         conn = sqlite3.connect(f'file:{db_path}?mode=ro', uri=True)
         cursor = conn.cursor()
-        cursor.execute("SELECT ieee, nwk, manufacturer, model, name, quirk_applied, quirk_class, quirk_id, manufacturer_code, power_source, lqi, rssi, last_seen, available, device_type, signature FROM devices")
+        
+        # Example query joining multiple tables to gather all necessary device information
+        cursor.execute("""
+            SELECT d.ieee, d.nwk, d.manufacturer, d.model, d.name, d.quirk_applied, d.quirk_class, d.quirk_id, 
+                   d.manufacturer_code, d.power_source, d.lqi, d.rssi, d.last_seen, d.available, d.device_type, d.signature,
+                   e.endpoint_id, e.profile_id, e.device_type, c.cluster_id, c.cluster_type
+            FROM devices_v13 d
+            LEFT JOIN endpoints_v13 e ON d.ieee = e.ieee
+            LEFT JOIN clusters_v13 c ON e.endpoint_id = c.endpoint_id
+        """)
         rows = cursor.fetchall()
 
         for row in rows:
@@ -39,9 +48,14 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         conn.close()
     except sqlite3.Error as e:
         _LOGGER.error(f"Error reading zigbee.db: {e}")
+    except sqlite3.OperationalError as e:
+        _LOGGER.error(f"Operational error reading zigbee.db: {e}")
 
-    entities = [ZigbeeDeviceInfoSensor(device) for device in devices]
-    async_add_entities(entities, True)
+    if devices:
+        entities = [ZigbeeDeviceInfoSensor(device) for device in devices]
+        async_add_entities(entities, True)
+    else:
+        _LOGGER.warning("No devices found in zigbee.db")
 
 class ZigbeeDeviceInfoSensor(Entity):
     def __init__(self, device_info):
