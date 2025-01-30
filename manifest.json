@@ -1,8 +1,9 @@
 {
   "domain": "zha_device_info",
   "name": "ZHA Device Info",
-  "version": "1.0",
-  "requirements": ["zigpy"],
+  "version": "0.0.1",
+  "documentation": "https://github.com/iamjoshk/zha-device-info",
+  "requirements": [],
   "dependencies": [],
-  "codeowners": []
+  "codeowners": ["@iamjoshk"]
 }

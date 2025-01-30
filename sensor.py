@@ -1,20 +1,49 @@
 import logging
+import sqlite3
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.entity import Entity
+from zha.zigbee.device import DeviceInfo
 
 _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    # Example: Fetch device info from zigpy
-    from zigpy.zha.device import DeviceInfo
+    db_path = hass.config.path("zigbee.db")
+    devices = []
 
-    # Replace with actual device fetching logic
-    devices = [DeviceInfo(ieee="00:11:22:33:44:55:66:77", nwk=0x1234, manufacturer="Example", model="Model")]
+    try:
+        conn = sqlite3.connect(f'file:{db_path}?mode=ro', uri=True)
+        cursor = conn.cursor()
+        cursor.execute("SELECT ieee, nwk, manufacturer, model, name, quirk_applied, quirk_class, quirk_id, manufacturer_code, power_source, lqi, rssi, last_seen, available, device_type, signature FROM devices")
+        rows = cursor.fetchall()
+
+        for row in rows:
+            devices.append(DeviceInfo(
+                ieee=row[0],
+                nwk=row[1],
+                manufacturer=row[2],
+                model=row[3],
+                name=row[4],
+                quirk_applied=row[5],
+                quirk_class=row[6],
+                quirk_id=row[7],
+                manufacturer_code=row[8],
+                power_source=row[9],
+                lqi=row[10],
+                rssi=row[11],
+                last_seen=row[12],
+                available=row[13],
+                device_type=row[14],
+                signature=row[15]
+            ))
+
+        conn.close()
+    except sqlite3.Error as e:
+        _LOGGER.error(f"Error reading zigbee.db: {e}")
 
     entities = [ZigbeeDeviceInfoSensor(device) for device in devices]
     async_add_entities(entities, True)
 
-class ZigbeeDeviceInfoSensor(SensorEntity):
+class ZigbeeDeviceInfoSensor(Entity):
     def __init__(self, device_info):
         self._device_info = device_info
         self._name = f"Zigbee Device {device_info.ieee}"
@@ -34,4 +63,16 @@ class ZigbeeDeviceInfoSensor(SensorEntity):
             "ieee": self._device_info.ieee,
             "manufacturer": self._device_info.manufacturer,
             "model": self._device_info.model,
+            "name": self._device_info.name,
+            "quirk_applied": self._device_info.quirk_applied,
+            "quirk_class": self._device_info.quirk_class,
+            "quirk_id": self._device_info.quirk_id,
+            "manufacturer_code": self._device_info.manufacturer_code,
+            "power_source": self._device_info.power_source,
+            "lqi": self._device_info.lqi,
+            "rssi": self._device_info.rssi,
+            "last_seen": self._device_info.last_seen,
+            "available": self._device_info.available,
+            "device_type": self._device_info.device_type,
+            "signature": self._device_info.signature,
         }
