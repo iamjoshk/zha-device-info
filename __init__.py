@@ -96,11 +96,12 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
     return True
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up config entry."""
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-    return True
+# Remove these if you do not have a config_flow.py
+# async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+#     """Set up config entry."""
+#     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+#     return True
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Unload config entry."""
-    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+# async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+#     """Unload config entry."""
+#     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
