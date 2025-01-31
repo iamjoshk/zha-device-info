@@ -62,9 +62,27 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             for device in gateway.device_proxies.values():
                 await update_device_info(hass, device, device_registry)
 
+        async def get_ieee_from_device_id(hass: HomeAssistant, device_id: str) -> str:
+            """Retrieve the IEEE address using the device_id."""
+            try:
+                zha_device = async_get_zha_device_proxy(hass, device_id)
+                if not zha_device:
+                    _LOGGER.error("ZHA device proxy not found for device %s", device_id)
+                    return None
+                ieee = str(zha_device.device.ieee)
+                _LOGGER.debug("Retrieved IEEE address for device %s: %s", device_id, ieee)
+                return ieee
+            except Exception as err:
+                _LOGGER.error("Error retrieving IEEE address for device %s: %s", device_id, err)
+                return None
+
         async def update_device_info(hass: HomeAssistant, device: ZHADeviceProxy, device_registry: dict) -> None:
             """Helper function to update a single device's info."""
             try:
+                ieee = await get_ieee_from_device_id(hass, device.device_id)
+                if not ieee:
+                    return
+
                 zha_device = async_get_zha_device_proxy(hass, device.device_id)
                 if not zha_device:
                     _LOGGER.error("ZHA device proxy not found for device %s", device.device_id)
@@ -76,7 +94,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
                 device_info = {
                     "cluster_details": get_endpoint_cluster_attr_data(zha_device.device),
-                    "ieee": str(zha_device.device.ieee),
+                    "ieee": ieee,
                     "nwk": zha_device.device.nwk,
                     "manufacturer": zha_device.device.manufacturer,
                     "model": zha_device.device.model,
@@ -92,7 +110,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
                 # Convert bytes to string representation
                 for cluster in device_info["cluster_details"].values():
                     for attr in cluster["in_clusters"].values():
-                        if isinstance(attr["value"], bytes):
+                        if "value" in attr and isinstance(attr["value"], bytes):
                             attr["value"] = attr["value"].hex()
 
                 device_registry[zha_device.device_id] = device_info

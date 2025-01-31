@@ -70,8 +70,10 @@ class ZHADeviceInfoSensor(SensorEntity):
     def extra_state_attributes(self) -> Dict[str, Any]:
         """Return device specific state attributes."""
         try:
+            ieee = str(self._device.device.ieee)
+            _LOGGER.debug("IEEE address for device %s: %s", self._device.name, ieee)
             attributes = {
-                ATTR_IEEE: str(self._device.device.ieee),  # Access through device
+                ATTR_IEEE: ieee,  # Access through device
                 ATTR_NWK: self._device.device.nwk,
                 ATTR_MANUFACTURER: self._device.device.manufacturer,
                 ATTR_MODEL: self._device.device.model,
