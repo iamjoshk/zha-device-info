@@ -24,33 +24,22 @@ async def async_setup_entry(
     """Set up ZHA device info sensors from a config entry."""
     _LOGGER.debug("Setting up ZHA Device Info sensors")
     try:
-        zha_gateway = hass.data[zha.DOMAIN]
-        if not zha_gateway:
-            _LOGGER.error("ZHA gateway not found")
+        zha_data = hass.data[zha.DOMAIN][DATA_ZHA]
+        if not zha_data:
+            _LOGGER.error("ZHA data not found")
             return
 
-        gateway = zha_gateway.gateway
-        if not gateway:
-            _LOGGER.error("ZHA gateway not initialized")
-            return
-
-        _LOGGER.debug("Found ZHA gateway: %s", gateway)
         entities = []
-        
-        # Get devices directly from the gateway
-        for device in gateway.devices.values():
+        # Access devices through the ZHA data structure
+        for device in zha_data.devices.values():
             if device is None:
+                _LOGGER.error("Device is None, skipping")
                 continue
-            
-            try:
-                _LOGGER.debug("Processing device: %s", device.name)
-                entity = ZHADeviceInfoSensor(device)
-                entities.append(entity)
-                hass.data[DOMAIN]["entities"].append(entity)
-                _LOGGER.debug("Added sensor for device: %s", device.name)
-            except Exception as err:
-                _LOGGER.error("Error creating sensor for device %s: %s", device.name, err)
-                continue
+            _LOGGER.debug("Adding ZHA Device Info sensor for device: %s", device.name)
+            entity = ZHADeviceInfoSensor(device)
+            entities.append(entity)
+            hass.data[DOMAIN]["entities"].append(entity)
+            _LOGGER.debug("Added ZHA Device Info sensor for device: %s", device.name)
 
         async_add_entities(entities, True)
         _LOGGER.debug("ZHA Device Info sensors setup complete")

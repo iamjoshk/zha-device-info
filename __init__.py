@@ -47,14 +47,12 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         async def handle_update(call) -> None:
             """Update device info."""
             _LOGGER.debug("Updating ZHA device info")
-            zha_gateway = hass.data[zha.DOMAIN]
-            if not zha_gateway or DATA_ZHA not in zha_gateway:
-                _LOGGER.error("ZHA gateway not found")
+            zha_data = hass.data[zha.DOMAIN][DATA_ZHA]
+            if not zha_data:
+                _LOGGER.error("ZHA data not found")
                 return
-            
-            gateway = zha_gateway[DATA_ZHA]
-            app = gateway.application_controller
-            for device in app.devices.values():
+
+            for device in zha_data.devices.values():
                 if device is None:
                     _LOGGER.error("Device is None, skipping")
                     continue
