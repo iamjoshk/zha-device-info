@@ -48,7 +48,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             _LOGGER.debug("Updating ZHA device info")
             gateway: ZHAGateway = hass.data.get("zha_gateway")
             if not gateway:
-                _LOGGER.error("ZHA gateway not found")
+                _LOGGER.error("ZHA gateway not found in hass.data")
                 return
 
             for device in gateway.device_proxies.values():
