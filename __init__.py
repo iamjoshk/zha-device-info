@@ -38,7 +38,9 @@ SERVICE_SCHEMAS = {
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up ZHA Device Info."""
+    _LOGGER.debug("Setting up ZHA Device Info integration")
     if DOMAIN not in config:
+        _LOGGER.debug("ZHA Device Info not in config")
         return True
 
     hass.data[DOMAIN] = {
@@ -114,6 +116,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         EVENT_HOMEASSISTANT_STARTED,
         initial_update
     )
+    _LOGGER.debug("ZHA Device Info integration setup complete")
     return True
 
 # Remove these if you do not have a config_flow.py
