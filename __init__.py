@@ -52,6 +52,9 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
                 return
 
             for device in gateway.device_proxies.values():
+                if device is None:
+                    _LOGGER.error("Device is None, skipping")
+                    continue
                 await update_device_info(hass, device, device_registry)
 
         async def update_device_info(hass: HomeAssistant, device: ZHADeviceProxy, device_registry: dict) -> None:
