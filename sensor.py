@@ -41,6 +41,9 @@ async def async_setup_entry(
         _LOGGER.debug("ZHA gateway type: %s", type(zha_data.gateway_proxy.gateway))
         _LOGGER.debug("Available gateway attributes: %s", dir(zha_data.gateway_proxy.gateway))
         
+        if DOMAIN not in hass.data:
+            hass.data[DOMAIN] = {"entities": []}
+        
         entities = []
         for device in zha_data.gateway_proxy.gateway.devices.values():
             if device is None:

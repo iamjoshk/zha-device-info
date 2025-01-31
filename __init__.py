@@ -36,10 +36,11 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         return True
 
     try:
-        hass.data[DOMAIN] = {
-            "device_registry": {},
-            "entities": []
-        }
+        if DOMAIN not in hass.data:
+            hass.data[DOMAIN] = {
+                "device_registry": {},
+                "entities": []
+            }
         _LOGGER.debug("Initialized device registry and entities list")
 
         device_registry = hass.data[DOMAIN]["device_registry"]
