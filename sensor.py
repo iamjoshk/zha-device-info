@@ -29,13 +29,12 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-async def async_setup_platform(
+async def async_setup_entry(
     hass: HomeAssistant,
-    config: ConfigType,
+    config_entry: ConfigType,
     async_add_entities: AddEntitiesCallback,
-    discovery_info: Optional[DiscoveryInfoType] = None,
 ) -> None:
-    """Set up ZHA device info sensors."""
+    """Set up ZHA device info sensors from a config entry."""
     _LOGGER.debug("Setting up ZHA Device Info sensors")
     try:
         gateway = hass.data.get("zha_gateway")
