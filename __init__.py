@@ -52,7 +52,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
                 _LOGGER.error("ZHA data or gateway proxy not found")
                 return
 
-            for device in zha_data.gateway_proxy.devices.values():
+            for device in zha_data.gateway_proxy.application_controller.devices.values():
                 if device is None:
                     _LOGGER.error("Device is None, skipping")
                     continue
