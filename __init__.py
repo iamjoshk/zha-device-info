@@ -37,8 +37,14 @@ SERVICE_SCHEMAS = {
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up ZHA Device Info."""
-    hass.data[DOMAIN] = {}
-    device_registry = {}
+    if DOMAIN not in config:
+        return True
+
+    hass.data[DOMAIN] = {
+        "device_registry": {}
+    }
+
+    device_registry = hass.data[DOMAIN]["device_registry"]
 
     async def handle_update(call) -> None:
         """Update device info."""
@@ -47,37 +53,24 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             _LOGGER.error("ZHA gateway not found")
             return
 
+        device_registry = hass.data[DOMAIN]["device_registry"]
+
         for device in gateway.device_proxies.values():
-            zha_device: ZHADeviceProxy = async_get_zha_device_proxy(
-                hass, device.device_id
-            )
-            
-            device_info = zha_device.zha_device_info
-            device_info["cluster_details"] = get_endpoint_cluster_attr_data(
-                zha_device.device
-            )
+            try:
+                zha_device = async_get_zha_device_proxy(hass, device.device_id)
+                if not zha_device:
+                    continue
 
-            if isinstance(zha_device.device.device, (CustomDevice, CustomDeviceV2)):
-                signature = deepcopy(
-                    zha_device.device.device.replacement 
-                    if isinstance(zha_device.device.device, CustomDeviceV2)
-                    else zha_device.device.device.signature
+                device_info = zha_device.device.zha_device_info
+                device_info["cluster_details"] = get_endpoint_cluster_attr_data(
+                    zha_device.device
                 )
-                
-                # Convert IDs to hex
-                for ep in signature["endpoints"].values():
-                    if "profile_id" in ep:
-                        ep["profile_id"] = f"0x{ep['profile_id']:04x}"
-                    if "device_type" in ep:
-                        ep["device_type"] = f"0x{ep['device_type']:04x}"
-                    if "input_clusters" in ep:
-                        ep["input_clusters"] = [f"0x{c:04x}" for c in ep["input_clusters"]]
-                    if "output_clusters" in ep:
-                        ep["output_clusters"] = [f"0x{c:04x}" for c in ep["output_clusters"]]
-                
-                device_info["original_signature"] = signature
 
-            device_registry[device.ieee] = device_info
+                # Use device_id instead of ieee
+                device_registry[zha_device.device_id] = device_info
+                
+            except Exception as err:
+                _LOGGER.error("Error processing device %s: %s", device.device_id, err)
 
     async def handle_export(call) -> None:
         """Export device info to JSON."""
