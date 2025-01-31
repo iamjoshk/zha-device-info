@@ -37,18 +37,21 @@ async def async_setup_platform(
 ) -> None:
     """Set up ZHA device info sensors."""
     _LOGGER.debug("Setting up ZHA Device Info sensors")
-    gateway = get_zha_gateway(hass)
-    if not gateway:
-        _LOGGER.error("ZHA gateway not found")
-        return
+    try:
+        gateway = get_zha_gateway(hass)
+        if not gateway:
+            _LOGGER.error("ZHA gateway not found")
+            return
 
-    entities = []
-    for device in gateway.devices.values():
-        _LOGGER.debug("Adding ZHA Device Info sensor for device: %s", device.name)
-        entities.append(ZHADeviceInfoSensor(device))
+        entities = []
+        for device in gateway.devices.values():
+            _LOGGER.debug("Adding ZHA Device Info sensor for device: %s", device.name)
+            entities.append(ZHADeviceInfoSensor(device))
 
-    async_add_entities(entities)
-    _LOGGER.debug("ZHA Device Info sensors setup complete")
+        async_add_entities(entities)
+        _LOGGER.debug("ZHA Device Info sensors setup complete")
+    except Exception as err:
+        _LOGGER.error("Error setting up ZHA Device Info sensors: %s", err)
 
 
 class ZHADeviceInfoSensor(SensorEntity):
