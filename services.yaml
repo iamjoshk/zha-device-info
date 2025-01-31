@@ -8,3 +8,4 @@
     path:
       description: "The path to save the exported JSON file."
       example: "/config/zha_devices.json"
+
