@@ -1,7 +1,21 @@
 """Constants for ZHA Device Info integration."""
 
+import voluptuous as vol
+
 DOMAIN = "zha_device_info"
 PLATFORMS = ["sensor"]
+
+# Service names
+SERVICE_UPDATE = "update"
+SERVICE_EXPORT = "export"
+
+# Service schemas
+SERVICE_SCHEMAS = {
+    SERVICE_UPDATE: vol.Schema({}),
+    SERVICE_EXPORT: vol.Schema({
+        vol.Optional("path"): str,
+    })
+}
 
 # Attributes
 ATTR_IEEE = "ieee"

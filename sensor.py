@@ -12,6 +12,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.helpers.entity import async_generate_entity_id
+from homeassistant.helpers.device_registry import async_get
 
 from .const import DOMAIN, ATTR_IEEE, ATTR_NWK, ATTR_MANUFACTURER, ATTR_MODEL, ATTR_NAME, ATTR_QUIRK_APPLIED, ATTR_POWER_SOURCE, ATTR_LQI, ATTR_RSSI, ATTR_LAST_SEEN, ATTR_AVAILABLE
 
@@ -45,6 +46,8 @@ async def async_setup_entry(
         if DOMAIN not in hass.data:
             hass.data[DOMAIN] = {"entities": []}
         
+        device_registry = async_get(hass)
+        
         entities = []
         for device in zha_data.gateway_proxy.gateway.devices.values():
             if device is None:
@@ -55,7 +58,7 @@ async def async_setup_entry(
             _LOGGER.debug("Adding ZHA Device Info sensor for device: %s", device.name)
             
             try:
-                entity = ZHADeviceInfoSensor(hass, device)
+                entity = ZHADeviceInfoSensor(hass, device, device_registry)
                 entities.append(entity)
                 hass.data[DOMAIN]["entities"].append(entity)
                 _LOGGER.debug("Added ZHA Device Info sensor for device: %s", device.name)
@@ -73,10 +76,11 @@ class ZHADeviceInfoSensor(SensorEntity):
 
     _attr_should_poll = False
     
-    def __init__(self, hass: HomeAssistant, device) -> None:
+    def __init__(self, hass: HomeAssistant, device, device_registry) -> None:
         """Initialize the sensor."""
         self._device = device
-        device_name = device.name_by_user or device.name
+        device_entry = device_registry.async_get_device({(DOMAIN, str(device.ieee))})
+        device_name = device_entry.name_by_user if device_entry and device_entry.name_by_user else device.name
         self._attr_name = f"ZHA Device Info {device_name}"
         self._attr_unique_id = f"{DOMAIN}_{device.ieee}"  # Use ieee
         self.entity_id = async_generate_entity_id("sensor.{}", self._attr_name.lower().replace(" ", "_"), hass=hass)
