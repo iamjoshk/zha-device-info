@@ -4,6 +4,7 @@ from datetime import datetime
 
 import voluptuous as vol
 from homeassistant.components.zha.core.gateway import ZHAGateway
+from homeassistant.components.zha.core.const import DATA_ZHA
 from homeassistant.components.zha.helpers import (
     ZHADeviceProxy,
     async_get_zha_device_proxy,
@@ -46,7 +47,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         async def handle_update(call) -> None:
             """Update device info."""
             _LOGGER.debug("Updating ZHA device info")
-            gateway: ZHAGateway = hass.data.get("zha_gateway")
+            gateway: ZHAGateway = hass.data.get(DATA_ZHA)
             if not gateway:
                 _LOGGER.error("ZHA gateway not found in hass.data")
                 return
