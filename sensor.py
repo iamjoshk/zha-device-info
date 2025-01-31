@@ -36,6 +36,7 @@ async def async_setup_platform(
     discovery_info: Optional[DiscoveryInfoType] = None,
 ) -> None:
     """Set up ZHA device info sensors."""
+    _LOGGER.debug("Setting up ZHA Device Info sensors")
     gateway = get_zha_gateway(hass)
     if not gateway:
         _LOGGER.error("ZHA gateway not found")
@@ -43,9 +44,11 @@ async def async_setup_platform(
 
     entities = []
     for device in gateway.devices.values():
+        _LOGGER.debug("Adding ZHA Device Info sensor for device: %s", device.name)
         entities.append(ZHADeviceInfoSensor(device))
 
     async_add_entities(entities)
+    _LOGGER.debug("ZHA Device Info sensors setup complete")
 
 
 class ZHADeviceInfoSensor(SensorEntity):
@@ -58,12 +61,13 @@ class ZHADeviceInfoSensor(SensorEntity):
         self._device = device
         self._attr_unique_id = f"{DOMAIN}_{device.device_id}"  # Use device_id
         self._attr_name = f"ZHA Info {device.name}"
+        _LOGGER.debug("Initialized ZHA Device Info sensor: %s", self._attr_name)
         
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
         """Return device specific state attributes."""
         try:
-            return {
+            attributes = {
                 ATTR_IEEE: str(self._device.device.ieee),  # Access through device
                 ATTR_NWK: self._device.device.nwk,
                 ATTR_MANUFACTURER: self._device.device.manufacturer,
@@ -76,6 +80,8 @@ class ZHADeviceInfoSensor(SensorEntity):
                 ATTR_LAST_SEEN: self._device.device.last_seen.isoformat(),
                 ATTR_AVAILABLE: self._device.device.available
             }
+            _LOGGER.debug("Attributes for device %s: %s", self._device.name, attributes)
+            return attributes
         except Exception as err:
-            _LOGGER.error("Error getting attributes: %s", err)
+            _LOGGER.error("Error getting attributes for device %s: %s", self._device.name, err)
             return {}

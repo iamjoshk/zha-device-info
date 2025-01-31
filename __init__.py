@@ -48,6 +48,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
     async def handle_update(call) -> None:
         """Update device info."""
+        _LOGGER.debug("Updating ZHA device info")
         gateway: ZHAGatewayProxy = get_zha_gateway_proxy(hass)
         if not gateway:
             _LOGGER.error("ZHA gateway not found")
@@ -66,6 +67,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
                 # Use device_id instead of ieee
                 device_registry[zha_device.device_id] = device_info
+                _LOGGER.debug("Updated info for device %s", zha_device.device_id)
                 
             except Exception as err:
                 _LOGGER.error("Error processing device %s: %s", device.device_id, err)
