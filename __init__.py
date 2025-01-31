@@ -1,13 +1,8 @@
-import collections
-import dataclasses
 import logging
-import os
 from typing import Any
-from copy import deepcopy
 from datetime import datetime
 
 import voluptuous as vol
-from homeassistant.components.zha.diagnostics import get_endpoint_cluster_attr_data
 from homeassistant.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
@@ -18,9 +13,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.json import save_json
 from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
-from slugify import slugify
-from zigpy.quirks import CustomDevice
-from zigpy.quirks.v2 import CustomDeviceV2
 
 from .const import DOMAIN, PLATFORMS
 
@@ -62,27 +54,9 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             for device in gateway.device_proxies.values():
                 await update_device_info(hass, device, device_registry)
 
-        async def get_ieee_from_device_id(hass: HomeAssistant, device_id: str) -> str:
-            """Retrieve the IEEE address using the device_id."""
-            try:
-                zha_device = async_get_zha_device_proxy(hass, device_id)
-                if not zha_device:
-                    _LOGGER.error("ZHA device proxy not found for device %s", device_id)
-                    return None
-                ieee = str(zha_device.device.ieee)
-                _LOGGER.debug("Retrieved IEEE address for device %s: %s", device_id, ieee)
-                return ieee
-            except Exception as err:
-                _LOGGER.error("Error retrieving IEEE address for device %s: %s", device_id, err)
-                return None
-
         async def update_device_info(hass: HomeAssistant, device: ZHADeviceProxy, device_registry: dict) -> None:
             """Helper function to update a single device's info."""
             try:
-                ieee = await get_ieee_from_device_id(hass, device.device_id)
-                if not ieee:
-                    return
-
                 zha_device = async_get_zha_device_proxy(hass, device.device_id)
                 if not zha_device:
                     _LOGGER.error("ZHA device proxy not found for device %s", device.device_id)
@@ -93,8 +67,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
                     last_seen = datetime.fromtimestamp(last_seen)
 
                 device_info = {
-                    "cluster_details": get_endpoint_cluster_attr_data(zha_device.device),
-                    "ieee": ieee,
+                    "ieee": str(zha_device.device.ieee),
                     "nwk": zha_device.device.nwk,
                     "manufacturer": zha_device.device.manufacturer,
                     "model": zha_device.device.model,
@@ -106,12 +79,6 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
                     "last_seen": last_seen.isoformat(),
                     "available": zha_device.device.available,
                 }
-
-                # Convert bytes to string representation
-                for cluster in device_info["cluster_details"].values():
-                    for attr in cluster["in_clusters"].values():
-                        if "value" in attr and isinstance(attr["value"], bytes):
-                            attr["value"] = attr["value"].hex()
 
                 device_registry[zha_device.device_id] = device_info
                 _LOGGER.debug("Updated info for device %s", zha_device.device_id)
@@ -156,9 +123,6 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         _LOGGER.error("Error during setup: %s", err)
         return False
 
-    # Ensure async_setup_entry is called
-    hass.async_create_task(hass.config_entries.async_forward_entry_setups(entry, PLATFORMS))
-
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up config entry."""
     _LOGGER.debug("Setting up ZHA Device Info config entry")
@@ -177,8 +141,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         result = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
         _LOGGER.debug("ZHA Device Info config entry unloaded")
         return result
-        _LOGGER.error("Error unloading config entry: %s", err)
     except Exception as err:
         _LOGGER.error("Error unloading config entry: %s", err)
-        return False
         return False
