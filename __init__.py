@@ -47,20 +47,30 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         async def handle_update(call) -> None:
             """Update device info."""
             _LOGGER.debug("Updating ZHA device info")
-            _LOGGER.debug("hass.data: %s", hass.data)
+            _LOGGER.debug("Available domains in hass.data: %s", list(hass.data.keys()))
             zha_data = hass.data.get(zha.DOMAIN)
+            _LOGGER.debug("ZHA data type: %s", type(zha_data))
+            
             if not zha_data:
                 _LOGGER.error("ZHA data not found in hass.data")
                 return
+                
+            _LOGGER.debug("ZHA gateway_proxy type: %s", type(zha_data.gateway_proxy))
             if not zha_data.gateway_proxy:
                 _LOGGER.error("ZHA gateway proxy not found in zha_data")
                 return
 
-            for device in zha_data.gateway_proxy.gateway.devices.values():
-                if device is None:
-                    _LOGGER.error("Device is None, skipping")
-                    continue
-                await update_device_info(hass, device, device_registry)
+            _LOGGER.debug("ZHA gateway type: %s", type(zha_data.gateway_proxy.gateway))
+            try:
+                for device in zha_data.gateway_proxy.gateway.devices.values():
+                    if device is None:
+                        _LOGGER.error("Device is None, skipping")
+                        continue
+                    _LOGGER.debug("Processing device type: %s", type(device))
+                    _LOGGER.debug("Device attributes: %s", dir(device))
+                    await update_device_info(hass, device, device_registry)
+            except Exception as dev_err:
+                _LOGGER.exception("Error processing devices: %s", dev_err)
 
             # Update the state of each ZHA Device Info sensor
             for entity in hass.data[DOMAIN]["entities"]:

@@ -24,31 +24,44 @@ async def async_setup_entry(
     """Set up ZHA device info sensors from a config entry."""
     _LOGGER.debug("Setting up ZHA Device Info sensors")
     try:
-        _LOGGER.debug("hass.data: %s", hass.data)
+        _LOGGER.debug("Available domains in hass.data: %s", list(hass.data.keys()))
         zha_data = hass.data.get(zha.DOMAIN)
+        _LOGGER.debug("ZHA data type: %s", type(zha_data))
+        _LOGGER.debug("ZHA data attributes: %s", dir(zha_data))
+        
         if not zha_data:
             _LOGGER.error("ZHA data not found in hass.data")
             return
+            
+        _LOGGER.debug("ZHA gateway_proxy type: %s", type(zha_data.gateway_proxy))
         if not zha_data.gateway_proxy:
             _LOGGER.error("ZHA gateway proxy not found in zha_data")
             return
 
+        _LOGGER.debug("ZHA gateway type: %s", type(zha_data.gateway_proxy.gateway))
+        _LOGGER.debug("Available gateway attributes: %s", dir(zha_data.gateway_proxy.gateway))
+        
         entities = []
-        # Access devices through the ZHA gateway proxy's gateway attribute
         for device in zha_data.gateway_proxy.gateway.devices.values():
             if device is None:
                 _LOGGER.error("Device is None, skipping")
                 continue
+            _LOGGER.debug("Device type: %s", type(device))
+            _LOGGER.debug("Device attributes: %s", dir(device))
             _LOGGER.debug("Adding ZHA Device Info sensor for device: %s", device.name)
-            entity = ZHADeviceInfoSensor(device)
-            entities.append(entity)
-            hass.data[DOMAIN]["entities"].append(entity)
-            _LOGGER.debug("Added ZHA Device Info sensor for device: %s", device.name)
+            
+            try:
+                entity = ZHADeviceInfoSensor(device)
+                entities.append(entity)
+                hass.data[DOMAIN]["entities"].append(entity)
+                _LOGGER.debug("Added ZHA Device Info sensor for device: %s", device.name)
+            except Exception as entity_err:
+                _LOGGER.exception("Error creating sensor for device %s: %s", device.name, entity_err)
 
         async_add_entities(entities, True)
         _LOGGER.debug("ZHA Device Info sensors setup complete")
     except Exception as err:
-        _LOGGER.error("Error setting up ZHA Device Info sensors: %s", err)
+        _LOGGER.exception("Error setting up ZHA Device Info sensors: %s", err, exc_info=True)
 
 
 class ZHADeviceInfoSensor(SensorEntity):
