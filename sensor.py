@@ -94,9 +94,10 @@ class ZHADeviceInfoSensor(SensorEntity):
             last_seen = self._device.last_seen
             if isinstance(last_seen, float):
                 last_seen = datetime.fromtimestamp(last_seen)
+            nwk_hex = f"0x{self._device.nwk:04x}"
             attributes = {
                 ATTR_IEEE: ieee,  # Access through device
-                ATTR_NWK: self._device.nwk,
+                ATTR_NWK: nwk_hex,
                 ATTR_MANUFACTURER: self._device.manufacturer,
                 ATTR_MODEL: self._device.model,
                 ATTR_NAME: self._device.name,

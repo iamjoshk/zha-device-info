@@ -89,10 +89,10 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
                 last_seen = zha_device.device.last_seen
                 if isinstance(last_seen, float):
                     last_seen = datetime.fromtimestamp(last_seen)
-
+                nwk_hex = f"0x{zha_device.device.nwk:04x}"
                 device_info = {
                     "ieee": str(zha_device.device.ieee),
-                    "nwk": zha_device.device.nwk,
+                    "nwk": nwk_hex,
                     "manufacturer": zha_device.device.manufacturer,
                     "model": zha_device.device.model,
                     "name": zha_device.device.name,
