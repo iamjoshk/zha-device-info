@@ -3,11 +3,10 @@ from typing import Any
 from datetime import datetime
 
 import voluptuous as vol
+from homeassistant.components.zha.core.gateway import async_get_zha_gateway
 from homeassistant.components.zha.helpers import (
     ZHADeviceProxy,
-    ZHAGatewayProxy,
     async_get_zha_device_proxy,
-    get_zha_gateway_proxy,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -47,7 +46,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         async def handle_update(call) -> None:
             """Update device info."""
             _LOGGER.debug("Updating ZHA device info")
-            gateway: ZHAGatewayProxy = get_zha_gateway_proxy(hass)
+            gateway = await async_get_zha_gateway(hass)
             if not gateway:
                 _LOGGER.error("ZHA gateway not found")
                 return
