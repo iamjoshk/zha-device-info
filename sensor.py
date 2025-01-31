@@ -6,7 +6,7 @@ from datetime import datetime
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.components import zha
-from homeassistant.components.zha.const import DATA_ZHA
+from homeassistant.components.zha import get_zha_gateway
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -24,14 +24,14 @@ async def async_setup_entry(
     """Set up ZHA device info sensors from a config entry."""
     _LOGGER.debug("Setting up ZHA Device Info sensors")
     try:
-        zha_gateway = hass.data[zha.DOMAIN][DATA_ZHA]
-        if not zha_gateway:
-            _LOGGER.error("ZHA gateway not found in hass.data")
+        gateway = get_zha_gateway(hass)
+        if not gateway:
+            _LOGGER.error("ZHA gateway not found")
             return
 
         entities = []
-        # Access the gateway's device property directly
-        for device in zha_gateway.gateway.devices.values():
+        # Use gateway's devices directly
+        for device in gateway.devices.values():
             if device is None:
                 _LOGGER.error("Device is None, skipping")
                 continue

@@ -3,9 +3,7 @@ from typing import Any
 from datetime import datetime
 
 import voluptuous as vol
-from homeassistant.components import zha
-from homeassistant.components.zha.const import DATA_ZHA
-from zha.application.helpers import ZHAData
+from homeassistant.components.zha import get_zha_gateway
 from homeassistant.components.zha.helpers import (
     ZHADeviceProxy,
     async_get_zha_device_proxy,
@@ -48,12 +46,12 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         async def handle_update(call) -> None:
             """Update device info."""
             _LOGGER.debug("Updating ZHA device info")
-            zha_gateway = hass.data[zha.DOMAIN][DATA_ZHA]
-            if not zha_gateway:
-                _LOGGER.error("ZHA gateway not found in hass.data")
+            gateway = get_zha_gateway(hass)
+            if not gateway:
+                _LOGGER.error("ZHA gateway not found")
                 return
 
-            for device in zha_gateway.gateway.devices.values():
+            for device in gateway.devices.values():
                 if device is None:
                     _LOGGER.error("Device is None, skipping")
                     continue
