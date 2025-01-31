@@ -4,7 +4,7 @@ import logging
 from typing import Any, Dict, Optional
 
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.components import zha
+from homeassistant.components.zha import get_zha_gateway
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -12,6 +12,7 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from .const import (
     DOMAIN,
     ATTR_IEEE,
+    ATTR_NWK,  # Add NWK attribute
     ATTR_MANUFACTURER,
     ATTR_MODEL,
     ATTR_NAME,
@@ -32,24 +33,24 @@ async def async_setup_platform(
     discovery_info: Optional[DiscoveryInfoType] = None,
 ) -> None:
     """Set up ZHA device info sensors."""
-    zha_gateway = zha.get_gateway(hass)
-    if not zha_gateway:
+    gateway = get_zha_gateway(hass)
+    if not gateway:
         _LOGGER.error("ZHA gateway not found")
         return
 
     entities = []
-    for device in zha_gateway.devices.values():
-        if isinstance(device, zha.core.device.ZHADevice):
-            entities.append(ZHADeviceInfoSensor(device))
+    for device in gateway.devices.values():
+        entities.append(ZHADeviceInfoSensor(device))
 
     async_add_entities(entities)
+
 
 class ZHADeviceInfoSensor(SensorEntity):
     """ZHA Device Info sensor."""
 
     _attr_should_poll = False
     
-    def __init__(self, device: ZHADevice) -> None:
+    def __init__(self, device) -> None:
         """Initialize the sensor."""
         self._device = device
         self._attr_unique_id = f"{DOMAIN}_{device.ieee}"
@@ -61,6 +62,7 @@ class ZHADeviceInfoSensor(SensorEntity):
         """Return device specific state attributes."""
         return {
             ATTR_IEEE: str(self._device.ieee),
+            ATTR_NWK: self._device.nwk,  # Add NWK attribute
             ATTR_MANUFACTURER: self._device.manufacturer,
             ATTR_MODEL: self._device.model,
             ATTR_NAME: self._device.name,
