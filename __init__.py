@@ -61,6 +61,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             # Update the state of each ZHA Device Info sensor
             for entity in hass.data[DOMAIN]["entities"]:
                 entity.async_write_ha_state()
+                _LOGGER.debug("Updated state for entity: %s", entity.name)
 
         async def update_device_info(hass: HomeAssistant, device: ZHADeviceProxy, device_registry: dict) -> None:
             """Helper function to update a single device's info."""

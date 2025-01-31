@@ -53,6 +53,7 @@ async def async_setup_platform(
             entity = ZHADeviceInfoSensor(device)
             entities.append(entity)
             hass.data[DOMAIN]["entities"].append(entity)
+            _LOGGER.debug("Added ZHA Device Info sensor for device: %s", device.name)
 
         async_add_entities(entities, True)
         _LOGGER.debug("ZHA Device Info sensors setup complete")
