@@ -3,7 +3,7 @@ from typing import Any
 from datetime import datetime
 
 import voluptuous as vol
-from homeassistant.components.zha.core.gateway import ZHAGateway
+from homeassistant.components.zha import ZHAGateway
 from homeassistant.components.zha.core.const import DATA_ZHA
 from homeassistant.components.zha.helpers import (
     ZHADeviceProxy,
