@@ -43,85 +43,94 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         _LOGGER.debug("ZHA Device Info not in config")
         return True
 
-    hass.data[DOMAIN] = {
-        "device_registry": {}
-    }
+    try:
+        hass.data[DOMAIN] = {
+            "device_registry": {}
+        }
+        _LOGGER.debug("Initialized device registry")
 
-    device_registry = hass.data[DOMAIN]["device_registry"]
+        device_registry = hass.data[DOMAIN]["device_registry"]
 
-    async def handle_update(call) -> None:
-        """Update device info."""
-        _LOGGER.debug("Updating ZHA device info")
-        gateway: ZHAGatewayProxy = get_zha_gateway_proxy(hass)
-        if not gateway:
-            _LOGGER.error("ZHA gateway not found")
-            return
-
-        for device in gateway.device_proxies.values():
-            await update_device_info(hass, device, device_registry)
-
-    async def update_device_info(hass: HomeAssistant, device: ZHADeviceProxy, device_registry: dict) -> None:
-        """Helper function to update a single device's info."""
-        try:
-            zha_device = async_get_zha_device_proxy(hass, device.device_id)
-            if not zha_device:
-                _LOGGER.error("ZHA device proxy not found for device %s", device.device_id)
+        async def handle_update(call) -> None:
+            """Update device info."""
+            _LOGGER.debug("Updating ZHA device info")
+            gateway: ZHAGatewayProxy = get_zha_gateway_proxy(hass)
+            if not gateway:
+                _LOGGER.error("ZHA gateway not found")
                 return
 
-            last_seen = zha_device.device.last_seen
-            if isinstance(last_seen, float):
-                last_seen = datetime.fromtimestamp(last_seen)
+            for device in gateway.device_proxies.values():
+                await update_device_info(hass, device, device_registry)
 
-            device_info = {
-                "cluster_details": get_endpoint_cluster_attr_data(zha_device.device),
-                "ieee": str(zha_device.device.ieee),
-                "nwk": zha_device.device.nwk,
-                "manufacturer": zha_device.device.manufacturer,
-                "model": zha_device.device.model,
-                "name": zha_device.device.name,
-                "quirk_applied": zha_device.device.quirk_applied,
-                "power_source": zha_device.device.power_source,
-                "lqi": zha_device.device.lqi,
-                "rssi": zha_device.device.rssi,
-                "last_seen": last_seen.isoformat(),
-                "available": zha_device.device.available,
-            }
+        async def update_device_info(hass: HomeAssistant, device: ZHADeviceProxy, device_registry: dict) -> None:
+            """Helper function to update a single device's info."""
+            try:
+                zha_device = async_get_zha_device_proxy(hass, device.device_id)
+                if not zha_device:
+                    _LOGGER.error("ZHA device proxy not found for device %s", device.device_id)
+                    return
 
-            device_registry[zha_device.device_id] = device_info
-            _LOGGER.debug("Updated info for device %s", zha_device.device_id)
-            
-        except Exception as err:
-            _LOGGER.error("Error processing device %s: %s", device.device_id, err)
+                last_seen = zha_device.device.last_seen
+                if isinstance(last_seen, float):
+                    last_seen = datetime.fromtimestamp(last_seen)
 
-    async def handle_export(call) -> None:
-        """Export device info to JSON."""
-        path = call.data.get("path", hass.config.path("zha_devices.json"))
-        try:
-            await hass.async_add_executor_job(save_json, path, device_registry)
-            _LOGGER.info("Exported ZHA device info to %s", path)
-        except Exception as err:
-            _LOGGER.error("Failed to export: %s", err)
+                device_info = {
+                    "cluster_details": get_endpoint_cluster_attr_data(zha_device.device),
+                    "ieee": str(zha_device.device.ieee),
+                    "nwk": zha_device.device.nwk,
+                    "manufacturer": zha_device.device.manufacturer,
+                    "model": zha_device.device.model,
+                    "name": zha_device.device.name,
+                    "quirk_applied": zha_device.device.quirk_applied,
+                    "power_source": zha_device.device.power_source,
+                    "lqi": zha_device.device.lqi,
+                    "rssi": zha_device.device.rssi,
+                    "last_seen": last_seen.isoformat(),
+                    "available": zha_device.device.available,
+                }
 
-    # Register services
-    hass.services.async_register(
-        DOMAIN, SERVICE_UPDATE, handle_update,
-        schema=SERVICE_SCHEMAS[SERVICE_UPDATE]
-    )
-    hass.services.async_register(
-        DOMAIN, SERVICE_EXPORT, handle_export,
-        schema=SERVICE_SCHEMAS[SERVICE_EXPORT]
-    )
+                device_registry[zha_device.device_id] = device_info
+                _LOGGER.debug("Updated info for device %s", zha_device.device_id)
+                
+            except Exception as err:
+                _LOGGER.error("Error processing device %s: %s", device.device_id, err)
 
-    # Initial update
-    async def initial_update(event):
-        await handle_update(None)
+        async def handle_export(call) -> None:
+            """Export device info to JSON."""
+            path = call.data.get("path", hass.config.path("zha_devices.json"))
+            try:
+                await hass.async_add_executor_job(save_json, path, device_registry)
+                _LOGGER.info("Exported ZHA device info to %s", path)
+            except Exception as err:
+                _LOGGER.error("Failed to export: %s", err)
 
-    hass.bus.async_listen_once(
-        EVENT_HOMEASSISTANT_STARTED,
-        initial_update
-    )
-    _LOGGER.debug("ZHA Device Info integration setup complete")
-    return True
+        # Register services
+        hass.services.async_register(
+            DOMAIN, SERVICE_UPDATE, handle_update,
+            schema=SERVICE_SCHEMAS[SERVICE_UPDATE]
+        )
+        _LOGGER.debug("Registered update service")
+
+        hass.services.async_register(
+            DOMAIN, SERVICE_EXPORT, handle_export,
+            schema=SERVICE_SCHEMAS[SERVICE_EXPORT]
+        )
+        _LOGGER.debug("Registered export service")
+
+        # Initial update
+        async def initial_update(event):
+            await handle_update(None)
+
+        hass.bus.async_listen_once(
+            EVENT_HOMEASSISTANT_STARTED,
+            initial_update
+        )
+        _LOGGER.debug("ZHA Device Info integration setup complete")
+        return True
+
+    except Exception as err:
+        _LOGGER.error("Error during setup: %s", err)
+        return False
 
 # Remove these if you do not have a config_flow.py
 # async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
