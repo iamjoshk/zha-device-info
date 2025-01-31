@@ -89,6 +89,12 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
                     "available": zha_device.device.available,
                 }
 
+                # Convert bytes to string representation
+                for cluster in device_info["cluster_details"].values():
+                    for attr in cluster["in_clusters"].values():
+                        if isinstance(attr["value"], bytes):
+                            attr["value"] = attr["value"].hex()
+
                 device_registry[zha_device.device_id] = device_info
                 _LOGGER.debug("Updated info for device %s", zha_device.device_id)
                 
@@ -106,13 +112,13 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
         # Register services
         hass.services.async_register(
-            DOMAIN, SERVICE_UPDATE, handle_update,
+            DOMAIN, "zha_device_info.update", handle_update,
             schema=SERVICE_SCHEMAS[SERVICE_UPDATE]
         )
         _LOGGER.debug("Registered update service")
 
         hass.services.async_register(
-            DOMAIN, SERVICE_EXPORT, handle_export,
+            DOMAIN, "zha_device_info.export", handle_export,
             schema=SERVICE_SCHEMAS[SERVICE_EXPORT]
         )
         _LOGGER.debug("Registered export service")
