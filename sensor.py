@@ -91,6 +91,9 @@ class ZHADeviceInfoSensor(SensorEntity):
         try:
             ieee = str(self._device.ieee)
             _LOGGER.debug("IEEE address for device %s: %s", self._device.name, ieee)
+            last_seen = self._device.last_seen
+            if isinstance(last_seen, float):
+                last_seen = datetime.fromtimestamp(last_seen)
             attributes = {
                 ATTR_IEEE: ieee,  # Access through device
                 ATTR_NWK: self._device.nwk,
@@ -101,7 +104,7 @@ class ZHADeviceInfoSensor(SensorEntity):
                 ATTR_POWER_SOURCE: self._device.power_source,
                 ATTR_LQI: self._device.lqi,
                 ATTR_RSSI: self._device.rssi,
-                ATTR_LAST_SEEN: self._device.last_seen.isoformat(),
+                ATTR_LAST_SEEN: last_seen.isoformat(),
                 ATTR_AVAILABLE: self._device.available
             }
             _LOGGER.debug("Attributes for device %s: %s", self._device.name, attributes)
