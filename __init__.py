@@ -92,8 +92,10 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     )
 
     # Initial update
-    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, lambda _: handle_update(None))
-
+    hass.bus.async_listen_once(
+        EVENT_HOMEASSISTANT_STARTED,
+        lambda _: hass.async_create_task(handle_update(None))
+    )
     return True
 
 # Remove these if you do not have a config_flow.py
