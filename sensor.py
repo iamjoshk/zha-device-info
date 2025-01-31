@@ -10,23 +10,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
-from .const import (
-    DOMAIN,
-    ATTR_IEEE,
-    ATTR_NWK,
-    ATTR_MANUFACTURER,
-    ATTR_MODEL,
-    ATTR_NAME,
-    ATTR_QUIRK_APPLIED,
-    ATTR_POWER_SOURCE,
-    ATTR_LQI,
-    ATTR_RSSI,
-    ATTR_LAST_SEEN,
-    ATTR_AVAILABLE,
-    ATTR_QUIRK_CLASS,
-    ATTR_DEVICE_TYPE,
-    ATTR_SIGNATURE
-)
+from .const import DOMAIN, ATTR_IEEE, ATTR_NWK, ATTR_MANUFACTURER, ATTR_MODEL, ATTR_NAME, ATTR_QUIRK_APPLIED, ATTR_POWER_SOURCE, ATTR_LQI, ATTR_RSSI, ATTR_LAST_SEEN, ATTR_AVAILABLE
 
 _LOGGER = logging.getLogger(__name__)
 
