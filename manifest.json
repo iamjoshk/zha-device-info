@@ -7,6 +7,7 @@
   "dependencies": ["zha"],
   "codeowners": ["@iamjoshk"],
   "iot_class": "local_polling",
+  "config_flow": true,
   "services": "services.yaml"
 }
 
