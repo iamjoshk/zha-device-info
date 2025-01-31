@@ -3,7 +3,7 @@
   "name": "ZHA Device Info",
   "version": "0.1.0",
   "documentation": "https://github.com/iamjoshk/zha-device-info",
-  "requirements": [],
+  "requirements": ["python-slugify"],
   "dependencies": ["zha"],
   "codeowners": ["@iamjoshk"],
   "iot_class": "local_polling"

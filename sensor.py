@@ -21,7 +21,10 @@ from .const import (
     ATTR_LQI,
     ATTR_RSSI,
     ATTR_LAST_SEEN,
-    ATTR_AVAILABLE
+    ATTR_AVAILABLE,
+    ATTR_QUIRK_CLASS,
+    ATTR_DEVICE_TYPE,
+    ATTR_SIGNATURE
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -67,9 +70,12 @@ class ZHADeviceInfoSensor(SensorEntity):
             ATTR_MODEL: self._device.model,
             ATTR_NAME: self._device.name,
             ATTR_QUIRK_APPLIED: self._device.quirk_applied,
+            ATTR_QUIRK_CLASS: self._device.quirk_class,
             ATTR_POWER_SOURCE: self._device.power_source,
             ATTR_LQI: self._device.lqi,
             ATTR_RSSI: self._device.rssi,
             ATTR_LAST_SEEN: self._device.last_seen.isoformat(),
-            ATTR_AVAILABLE: self._device.available
+            ATTR_AVAILABLE: self._device.available,
+            ATTR_DEVICE_TYPE: self._device.device_type,
+            ATTR_SIGNATURE: self._device.signature
         }

@@ -3,6 +3,7 @@
 DOMAIN = "zha_device_info"
 PLATFORMS = ["sensor"]
 
+# Attributes
 ATTR_IEEE = "ieee"
 ATTR_NWK = "nwk"
 ATTR_MANUFACTURER = "manufacturer"
@@ -17,3 +18,5 @@ ATTR_LAST_SEEN = "last_seen"
 ATTR_AVAILABLE = "available"
 ATTR_DEVICE_TYPE = "device_type"
 ATTR_SIGNATURE = "signature"
+ATTR_CLUSTER_DETAILS = "cluster_details"
+ATTR_ENDPOINTS = "endpoints"
