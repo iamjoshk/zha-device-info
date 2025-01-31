@@ -90,3 +90,4 @@ class ZigbeeDeviceInfoSensor(Entity):
             "device_type": self._device_info.device_type,
             "signature": self._device_info.signature,
         }
+    
