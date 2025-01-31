@@ -5,7 +5,6 @@ from typing import Any, Dict, Optional
 from datetime import datetime
 
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.components.zha.core.gateway import async_get_zha_gateway
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -39,7 +38,7 @@ async def async_setup_platform(
     """Set up ZHA device info sensors."""
     _LOGGER.debug("Setting up ZHA Device Info sensors")
     try:
-        gateway = await async_get_zha_gateway(hass)
+        gateway = hass.data.get("zha_gateway")
         if not gateway:
             _LOGGER.error("ZHA gateway not found")
             return
