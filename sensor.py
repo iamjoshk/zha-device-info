@@ -24,7 +24,7 @@ async def async_setup_entry(
     """Set up ZHA device info sensors from a config entry."""
     _LOGGER.debug("Setting up ZHA Device Info sensors")
     try:
-        zha_data = hass.data[zha.DOMAIN][DATA_ZHA]
+        zha_data = hass.data.get(zha.DOMAIN)
         if not zha_data:
             _LOGGER.error("ZHA data not found")
             return
