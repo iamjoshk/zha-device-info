@@ -74,16 +74,16 @@ class ZHADeviceInfoSensor(SensorEntity):
             _LOGGER.debug("IEEE address for device %s: %s", self._device.name, ieee)
             attributes = {
                 ATTR_IEEE: ieee,  # Access through device
-                ATTR_NWK: self._device.device.nwk,
-                ATTR_MANUFACTURER: self._device.device.manufacturer,
-                ATTR_MODEL: self._device.device.model,
+                ATTR_NWK: self._device.device.nwk if 'value' in self._device.device else None,
+                ATTR_MANUFACTURER: self._device.device.manufacturer if 'value' in self._device.device else None,
+                ATTR_MODEL: self._device.device.model if 'value' in self._device.device else None,
                 ATTR_NAME: self._device.name,
-                ATTR_QUIRK_APPLIED: self._device.device.quirk_applied,
-                ATTR_POWER_SOURCE: self._device.device.power_source,
-                ATTR_LQI: self._device.device.lqi,
-                ATTR_RSSI: self._device.device.rssi,
-                ATTR_LAST_SEEN: self._device.device.last_seen.isoformat(),
-                ATTR_AVAILABLE: self._device.device.available
+                ATTR_QUIRK_APPLIED: self._device.device.quirk_applied if 'value' in self._device.device else None,
+                ATTR_POWER_SOURCE: self._device.device.power_source if 'value' in self._device.device else None,
+                ATTR_LQI: self._device.device.lqi if 'value' in self._device.device else None,
+                ATTR_RSSI: self._device.device.rssi if 'value' in self._device.device else None,
+                ATTR_LAST_SEEN: self._device.device.last_seen.isoformat() if 'value' in self._device.device else None,
+                ATTR_AVAILABLE: self._device.device.available if 'value' in self._device.device else None
             }
             _LOGGER.debug("Attributes for device %s: %s", self._device.name, attributes)
             return attributes
