@@ -11,6 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.entity import async_generate_entity_id
 
 from .const import DOMAIN, ATTR_IEEE, ATTR_NWK, ATTR_MANUFACTURER, ATTR_MODEL, ATTR_NAME, ATTR_QUIRK_APPLIED, ATTR_POWER_SOURCE, ATTR_LQI, ATTR_RSSI, ATTR_LAST_SEEN, ATTR_AVAILABLE
 
@@ -54,7 +55,7 @@ async def async_setup_entry(
             _LOGGER.debug("Adding ZHA Device Info sensor for device: %s", device.name)
             
             try:
-                entity = ZHADeviceInfoSensor(device)
+                entity = ZHADeviceInfoSensor(hass, device)
                 entities.append(entity)
                 hass.data[DOMAIN]["entities"].append(entity)
                 _LOGGER.debug("Added ZHA Device Info sensor for device: %s", device.name)
@@ -72,11 +73,12 @@ class ZHADeviceInfoSensor(SensorEntity):
 
     _attr_should_poll = False
     
-    def __init__(self, device) -> None:
+    def __init__(self, hass: HomeAssistant, device) -> None:
         """Initialize the sensor."""
         self._device = device
+        self._attr_name = f"ZHA Device Info {device.name}"
         self._attr_unique_id = f"{DOMAIN}_{device.ieee}"  # Use ieee
-        self._attr_name = f"ZHA Info {device.name}"
+        self.entity_id = async_generate_entity_id("sensor.{}", self._attr_name.lower().replace(" ", "_"), hass=hass)
         self._attr_device_info = {
             "identifiers": {(DOMAIN, str(device.ieee))},
             "name": device.name,
