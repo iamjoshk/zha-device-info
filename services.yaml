@@ -1,8 +1,8 @@
-zha_device_info.update:
+.zha_device_info.update:
   description: "Update ZHA device info."
   fields: {}
 
-zha_device_info.export:
+.zha_device_info.export:
   description: "Export ZHA device info to JSON."
   fields:
     path:
