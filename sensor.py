@@ -31,7 +31,9 @@ async def async_setup_entry(
             
         gateway = zha_gateway[DATA_ZHA]
         entities = []
-        for device in gateway.devices.values():
+        # Get devices through the gateway's app controller
+        app = gateway.application_controller
+        for device in app.devices.values():
             if device is None:
                 _LOGGER.error("Device is None, skipping")
                 continue

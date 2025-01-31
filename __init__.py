@@ -53,7 +53,8 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
                 return
             
             gateway = zha_gateway[DATA_ZHA]
-            for device in gateway.devices.values():
+            app = gateway.application_controller
+            for device in app.devices.values():
                 if device is None:
                     _LOGGER.error("Device is None, skipping")
                     continue
