@@ -50,7 +50,9 @@ async def async_setup_platform(
                 _LOGGER.error("Device is None, skipping")
                 continue
             _LOGGER.debug("Adding ZHA Device Info sensor for device: %s", device.name)
-            entities.append(ZHADeviceInfoSensor(device))
+            entity = ZHADeviceInfoSensor(device)
+            entities.append(entity)
+            hass.data[DOMAIN]["entities"].append(entity)
 
         async_add_entities(entities, True)
         _LOGGER.debug("ZHA Device Info sensors setup complete")
