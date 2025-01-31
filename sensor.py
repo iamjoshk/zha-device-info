@@ -8,7 +8,6 @@ from homeassistant.components.zha import get_zha_gateway
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-from homeassistant.helpers.discovery import async_load_platform
 
 from .const import (
     DOMAIN,
@@ -29,16 +28,6 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    if "zha_device_info" not in config:
-        return True
-
-    # Explicitly load the sensor platform
-    hass.async_create_task(
-        async_load_platform(hass, "sensor", "zha_device_info", {}, config)
-    )
-    return True
 
 async def async_setup_platform(
     hass: HomeAssistant,
