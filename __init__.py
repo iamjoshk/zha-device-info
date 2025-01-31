@@ -57,6 +57,10 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
                     continue
                 await update_device_info(hass, device, device_registry)
 
+            # Update the state of each ZHA Device Info sensor
+            for entity in hass.data[DOMAIN]["entities"]:
+                entity.async_write_ha_state()
+
         async def update_device_info(hass: HomeAssistant, device: ZHADeviceProxy, device_registry: dict) -> None:
             """Helper function to update a single device's info."""
             try:
@@ -100,13 +104,13 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
         # Register services
         hass.services.async_register(
-            DOMAIN, "zha_device_info.update", handle_update,
+            DOMAIN, SERVICE_UPDATE, handle_update,
             schema=SERVICE_SCHEMAS[SERVICE_UPDATE]
         )
         _LOGGER.debug("Registered update service")
 
         hass.services.async_register(
-            DOMAIN, "zha_device_info.export", handle_export,
+            DOMAIN, SERVICE_EXPORT, handle_export,
             schema=SERVICE_SCHEMAS[SERVICE_EXPORT]
         )
         _LOGGER.debug("Registered export service")

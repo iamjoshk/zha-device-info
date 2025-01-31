@@ -2,6 +2,7 @@
 
 import logging
 from typing import Any, Dict, Optional
+from datetime import datetime
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.components.zha import get_zha_gateway
@@ -51,7 +52,7 @@ async def async_setup_platform(
             _LOGGER.debug("Adding ZHA Device Info sensor for device: %s", device.name)
             entities.append(ZHADeviceInfoSensor(device))
 
-        async_add_entities(entities)
+        async_add_entities(entities, True)
         _LOGGER.debug("ZHA Device Info sensors setup complete")
     except Exception as err:
         _LOGGER.error("Error setting up ZHA Device Info sensors: %s", err)
@@ -93,3 +94,8 @@ class ZHADeviceInfoSensor(SensorEntity):
         except Exception as err:
             _LOGGER.error("Error getting attributes for device %s: %s", self._device.name, err)
             return {}
+
+    @property
+    def state(self) -> str:
+        """Return the state of the sensor."""
+        return datetime.now().isoformat()
