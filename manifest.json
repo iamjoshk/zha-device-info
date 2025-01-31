@@ -1,10 +1,11 @@
 {
   "domain": "zha_device_info",
   "name": "ZHA Device Info",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "documentation": "https://github.com/iamjoshk/zha-device-info",
   "requirements": [],
-  "dependencies": [],
-  "codeowners": ["@iamjoshk"]
+  "dependencies": ["zha"],
+  "codeowners": ["@iamjoshk"],
+  "iot_class": "local_polling"
 }
 

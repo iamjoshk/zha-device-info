@@ -4,8 +4,7 @@ import logging
 from typing import Any, Dict, Optional
 
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.components.zha.core.helpers import get_zha_gateway
-from homeassistant.components.zha.core.device import ZHADevice
+from homeassistant.components import zha
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -33,14 +32,14 @@ async def async_setup_platform(
     discovery_info: Optional[DiscoveryInfoType] = None,
 ) -> None:
     """Set up ZHA device info sensors."""
-    gateway = get_zha_gateway(hass)
-    if not gateway:
+    zha_gateway = zha.get_gateway(hass)
+    if not zha_gateway:
         _LOGGER.error("ZHA gateway not found")
         return
 
     entities = []
-    for device in gateway.devices.values():
-        if isinstance(device, ZHADevice):
+    for device in zha_gateway.devices.values():
+        if isinstance(device, zha.core.device.ZHADevice):
             entities.append(ZHADeviceInfoSensor(device))
 
     async_add_entities(entities)
