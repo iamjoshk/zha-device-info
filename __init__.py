@@ -52,7 +52,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
                 _LOGGER.error("ZHA data or gateway proxy not found")
                 return
 
-            for device in zha_data.gateway_proxy.application_controller.devices.values():
+            for device in zha_data.gateway_proxy.gateway.devices.values():
                 if device is None:
                     _LOGGER.error("Device is None, skipping")
                     continue
@@ -66,9 +66,9 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         async def update_device_info(hass: HomeAssistant, device: ZHADeviceProxy, device_registry: dict) -> None:
             """Helper function to update a single device's info."""
             try:
-                zha_device = async_get_zha_device_proxy(hass, device.device_id)
+                zha_device = async_get_zha_device_proxy(hass, device.ieee)
                 if not zha_device:
-                    _LOGGER.error("ZHA device proxy not found for device %s", device.device_id)
+                    _LOGGER.error("ZHA device proxy not found for device %s", device.ieee)
                     return
 
                 last_seen = zha_device.device.last_seen
@@ -89,11 +89,11 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
                     "available": zha_device.device.available,
                 }
 
-                device_registry[zha_device.device_id] = device_info
-                _LOGGER.debug("Updated info for device %s", zha_device.device_id)
+                device_registry[str(zha_device.device.ieee)] = device_info
+                _LOGGER.debug("Updated info for device %s", zha_device.device.ieee)
                 
             except Exception as err:
-                _LOGGER.error("Error processing device %s: %s", device.device_id, err)
+                _LOGGER.error("Error processing device %s: %s", device.ieee, err)
 
         async def handle_export(call) -> None:
             """Export device info to JSON."""

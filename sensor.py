@@ -30,8 +30,8 @@ async def async_setup_entry(
             return
 
         entities = []
-        # Access devices through the ZHA gateway proxy's application controller
-        for device in zha_data.gateway_proxy.application_controller.devices.values():
+        # Access devices through the ZHA gateway proxy's gateway attribute
+        for device in zha_data.gateway_proxy.gateway.devices.values():
             if device is None:
                 _LOGGER.error("Device is None, skipping")
                 continue
@@ -55,10 +55,10 @@ class ZHADeviceInfoSensor(SensorEntity):
     def __init__(self, device) -> None:
         """Initialize the sensor."""
         self._device = device
-        self._attr_unique_id = f"{DOMAIN}_{device.device_id}"  # Use device_id
+        self._attr_unique_id = f"{DOMAIN}_{device.ieee}"  # Use ieee
         self._attr_name = f"ZHA Info {device.name}"
         self._attr_device_info = {
-            "identifiers": {(DOMAIN, device.device_id)},
+            "identifiers": {(DOMAIN, str(device.ieee))},
             "name": device.name,
             "manufacturer": device.manufacturer,
             "model": device.model,
@@ -69,20 +69,20 @@ class ZHADeviceInfoSensor(SensorEntity):
     def extra_state_attributes(self) -> Dict[str, Any]:
         """Return device specific state attributes."""
         try:
-            ieee = str(self._device.device.ieee)
+            ieee = str(self._device.ieee)
             _LOGGER.debug("IEEE address for device %s: %s", self._device.name, ieee)
             attributes = {
                 ATTR_IEEE: ieee,  # Access through device
-                ATTR_NWK: self._device.device.nwk,
-                ATTR_MANUFACTURER: self._device.device.manufacturer,
-                ATTR_MODEL: self._device.device.model,
+                ATTR_NWK: self._device.nwk,
+                ATTR_MANUFACTURER: self._device.manufacturer,
+                ATTR_MODEL: self._device.model,
                 ATTR_NAME: self._device.name,
-                ATTR_QUIRK_APPLIED: self._device.device.quirk_applied,
-                ATTR_POWER_SOURCE: self._device.device.power_source,
-                ATTR_LQI: self._device.device.lqi,
-                ATTR_RSSI: self._device.device.rssi,
-                ATTR_LAST_SEEN: self._device.device.last_seen.isoformat(),
-                ATTR_AVAILABLE: self._device.device.available
+                ATTR_QUIRK_APPLIED: self._device.quirk_applied,
+                ATTR_POWER_SOURCE: self._device.power_source,
+                ATTR_LQI: self._device.lqi,
+                ATTR_RSSI: self._device.rssi,
+                ATTR_LAST_SEEN: self._device.last_seen.isoformat(),
+                ATTR_AVAILABLE: self._device.available
             }
             _LOGGER.debug("Attributes for device %s: %s", self._device.name, attributes)
             return attributes
