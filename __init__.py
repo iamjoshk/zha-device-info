@@ -156,6 +156,9 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         _LOGGER.error("Error during setup: %s", err)
         return False
 
+    # Ensure async_setup_entry is called
+    hass.async_create_task(hass.config_entries.async_forward_entry_setups(entry, PLATFORMS))
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up config entry."""
     _LOGGER.debug("Setting up ZHA Device Info config entry")
@@ -174,6 +177,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         result = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
         _LOGGER.debug("ZHA Device Info config entry unloaded")
         return result
+        _LOGGER.error("Error unloading config entry: %s", err)
     except Exception as err:
         _LOGGER.error("Error unloading config entry: %s", err)
+        return False
         return False
