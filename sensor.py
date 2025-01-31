@@ -25,13 +25,13 @@ async def async_setup_entry(
     _LOGGER.debug("Setting up ZHA Device Info sensors")
     try:
         zha_data = hass.data.get(zha.DOMAIN)
-        if not zha_data:
-            _LOGGER.error("ZHA data not found")
+        if not zha_data or not zha_data.gateway_proxy:
+            _LOGGER.error("ZHA data or gateway proxy not found")
             return
 
         entities = []
-        # Access devices through the ZHA gateway
-        for device in zha_data.gateway.devices.values():
+        # Access devices through the ZHA gateway proxy
+        for device in zha_data.gateway_proxy.devices.values():
             if device is None:
                 _LOGGER.error("Device is None, skipping")
                 continue
