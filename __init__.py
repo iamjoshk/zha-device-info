@@ -132,12 +132,24 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         _LOGGER.error("Error during setup: %s", err)
         return False
 
-# Remove these if you do not have a config_flow.py
-# async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-#     """Set up config entry."""
-#     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-#     return True
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up config entry."""
+    _LOGGER.debug("Setting up ZHA Device Info config entry")
+    try:
+        await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+        _LOGGER.debug("ZHA Device Info config entry setup complete")
+        return True
+    except Exception as err:
+        _LOGGER.error("Error setting up config entry: %s", err)
+        return False
 
-# async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-#     """Unload config entry."""
-#     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Unload config entry."""
+    _LOGGER.debug("Unloading ZHA Device Info config entry")
+    try:
+        result = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+        _LOGGER.debug("ZHA Device Info config entry unloaded")
+        return result
+    except Exception as err:
+        _LOGGER.error("Error unloading config entry: %s", err)
+        return False
