@@ -70,6 +70,12 @@ class ZHADeviceInfoSensor(SensorEntity):
         self._device = device
         self._attr_unique_id = f"{DOMAIN}_{device.device_id}"  # Use device_id
         self._attr_name = f"ZHA Info {device.name}"
+        self._attr_device_info = {
+            "identifiers": {(DOMAIN, device.device_id)},
+            "name": device.name,
+            "manufacturer": device.manufacturer,
+            "model": device.model,
+        }
         _LOGGER.debug("Initialized ZHA Device Info sensor: %s", self._attr_name)
         
     @property

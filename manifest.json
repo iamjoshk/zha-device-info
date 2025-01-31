@@ -6,6 +6,7 @@
   "requirements": ["python-slugify"],
   "dependencies": ["zha"],
   "codeowners": ["@iamjoshk"],
-  "iot_class": "local_polling"
+  "iot_class": "local_polling",
+  "services": "services.yaml"
 }
 
