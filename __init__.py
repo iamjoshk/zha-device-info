@@ -47,6 +47,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         async def handle_update(call) -> None:
             """Update device info."""
             _LOGGER.debug("Updating ZHA device info")
+            _LOGGER.debug("hass.data: %s", hass.data)
             zha_data = hass.data.get(zha.DOMAIN)
             if not zha_data:
                 _LOGGER.error("ZHA data not found in hass.data")
