@@ -53,8 +53,6 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             _LOGGER.error("ZHA gateway not found")
             return
 
-        device_registry = hass.data[DOMAIN]["device_registry"]
-
         for device in gateway.device_proxies.values():
             try:
                 zha_device = async_get_zha_device_proxy(hass, device.device_id)

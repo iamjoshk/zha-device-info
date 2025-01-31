@@ -12,7 +12,7 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from .const import (
     DOMAIN,
     ATTR_IEEE,
-    ATTR_NWK,  # Add NWK attribute
+    ATTR_NWK,
     ATTR_MANUFACTURER,
     ATTR_MODEL,
     ATTR_NAME,
