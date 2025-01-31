@@ -30,8 +30,8 @@ async def async_setup_entry(
             return
 
         entities = []
-        # Access devices through the ZHA data structure
-        for device in zha_data.devices.values():
+        # Access devices through the ZHA gateway
+        for device in zha_data.gateway.devices.values():
             if device is None:
                 _LOGGER.error("Device is None, skipping")
                 continue
