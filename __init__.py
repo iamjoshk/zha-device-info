@@ -58,36 +58,40 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             return
 
         for device in gateway.device_proxies.values():
-            try:
-                zha_device = async_get_zha_device_proxy(hass, device.device_id)
-                if not zha_device:
-                    _LOGGER.error("ZHA device proxy not found for device %s", device.device_id)
-                    continue
+            await update_device_info(hass, device, device_registry)
 
-                last_seen = zha_device.device.last_seen
-                if isinstance(last_seen, float):
-                    last_seen = datetime.fromtimestamp(last_seen)
+    async def update_device_info(hass: HomeAssistant, device: ZHADeviceProxy, device_registry: dict) -> None:
+        """Helper function to update a single device's info."""
+        try:
+            zha_device = async_get_zha_device_proxy(hass, device.device_id)
+            if not zha_device:
+                _LOGGER.error("ZHA device proxy not found for device %s", device.device_id)
+                return
 
-                device_info = {
-                    "cluster_details": get_endpoint_cluster_attr_data(zha_device.device),
-                    "ieee": str(zha_device.device.ieee),
-                    "nwk": zha_device.device.nwk,
-                    "manufacturer": zha_device.device.manufacturer,
-                    "model": zha_device.device.model,
-                    "name": zha_device.device.name,
-                    "quirk_applied": zha_device.device.quirk_applied,
-                    "power_source": zha_device.device.power_source,
-                    "lqi": zha_device.device.lqi,
-                    "rssi": zha_device.device.rssi,
-                    "last_seen": last_seen.isoformat(),
-                    "available": zha_device.device.available,
-                }
+            last_seen = zha_device.device.last_seen
+            if isinstance(last_seen, float):
+                last_seen = datetime.fromtimestamp(last_seen)
 
-                device_registry[zha_device.device_id] = device_info
-                _LOGGER.debug("Updated info for device %s", zha_device.device_id)
-                
-            except Exception as err:
-                _LOGGER.error("Error processing device %s: %s", device.device_id, err)
+            device_info = {
+                "cluster_details": get_endpoint_cluster_attr_data(zha_device.device),
+                "ieee": str(zha_device.device.ieee),
+                "nwk": zha_device.device.nwk,
+                "manufacturer": zha_device.device.manufacturer,
+                "model": zha_device.device.model,
+                "name": zha_device.device.name,
+                "quirk_applied": zha_device.device.quirk_applied,
+                "power_source": zha_device.device.power_source,
+                "lqi": zha_device.device.lqi,
+                "rssi": zha_device.device.rssi,
+                "last_seen": last_seen.isoformat(),
+                "available": zha_device.device.available,
+            }
+
+            device_registry[zha_device.device_id] = device_info
+            _LOGGER.debug("Updated info for device %s", zha_device.device_id)
+            
+        except Exception as err:
+            _LOGGER.error("Error processing device %s: %s", device.device_id, err)
 
     async def handle_export(call) -> None:
         """Export device info to JSON."""
