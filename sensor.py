@@ -76,12 +76,13 @@ class ZHADeviceInfoSensor(SensorEntity):
     def __init__(self, hass: HomeAssistant, device) -> None:
         """Initialize the sensor."""
         self._device = device
-        self._attr_name = f"ZHA Device Info {device.name}"
+        device_name = device.name_by_user or device.name
+        self._attr_name = f"ZHA Device Info {device_name}"
         self._attr_unique_id = f"{DOMAIN}_{device.ieee}"  # Use ieee
         self.entity_id = async_generate_entity_id("sensor.{}", self._attr_name.lower().replace(" ", "_"), hass=hass)
         self._attr_device_info = {
             "identifiers": {(DOMAIN, str(device.ieee))},
-            "name": device.name,
+            "name": device_name,
             "manufacturer": device.manufacturer,
             "model": device.model,
         }
