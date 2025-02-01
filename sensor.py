@@ -20,7 +20,7 @@ from homeassistant.const import (
 )
 
 from .const import (
-    DOMAIN, ATTR_IEEE, ATTR_NWK, 
+    DOMAIN, ATTR_DEVICE_TYPE, ATTR_IEEE, ATTR_NWK, 
     ATTR_MANUFACTURER, ATTR_MODEL, 
     ATTR_NAME, ATTR_QUIRK_APPLIED, 
     ATTR_QUIRK_CLASS, ATTR_POWER_SOURCE, 
@@ -137,7 +137,8 @@ class ZHADeviceInfoSensor(SensorEntity):
                 ATTR_LQI: self._device.lqi,
                 ATTR_RSSI: self._device.rssi,
                 ATTR_LAST_SEEN: last_seen.isoformat(),
-                ATTR_AVAILABLE: self._device.available
+                ATTR_AVAILABLE: self._device.available,
+                ATTR_DEVICE_TYPE: self._device.device_type,  # Add device type
             }
 
             # Add quirk_class if quirk is applied
@@ -223,6 +224,8 @@ class ZHADeviceAttributeSensor(SensorEntity):
                 return f"0x{self._device.nwk:04x}"
             elif ATTR_QUIRK_APPLIED in self._conf_data["attributes"]:
                 return self._device.quirk_applied  # Return quirk_applied as state
+            elif ATTR_DEVICE_TYPE in self._conf_data["attributes"]:
+                return str(self._device.device_type)  # Add device type handling
             return None
         except Exception as err:
             _LOGGER.error(

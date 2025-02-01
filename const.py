@@ -36,12 +36,13 @@ ATTR_CLUSTER_DETAILS = "cluster_details"
 ATTR_ENDPOINTS = "endpoints"
 
 # Splittable Attributes Configuration
-CONF_SPLIT_SIGNAL_STRENGTH = "split_signal_strength"
-CONF_SPLIT_LAST_SEEN = "split_last_seen"
-CONF_SPLIT_AVAILABILITY = "split_availability"
-CONF_SPLIT_POWER = "split_power"
-CONF_SPLIT_NWK = "split_nwk"  # New
-CONF_SPLIT_QUIRK = "split_quirk"  # New
+CONF_SPLIT_SIGNAL_STRENGTH = "split_signal_strength"  # Changed format
+CONF_SPLIT_LAST_SEEN = "split_last_seen"  # Changed format
+CONF_SPLIT_AVAILABILITY = "split_availability"  # Changed format
+CONF_SPLIT_POWER = "split_power_source"  # Changed format
+CONF_SPLIT_NWK = "split_network_address"  # Changed format
+CONF_SPLIT_QUIRK = "split_quirk_info"  # Changed format
+CONF_SPLIT_DEVICE_TYPE = "split_device_type"  # Changed format
 
 SPLITTABLE_ATTRIBUTES = {
     CONF_SPLIT_SIGNAL_STRENGTH: {
@@ -81,6 +82,23 @@ SPLITTABLE_ATTRIBUTES = {
         "icon": "mdi:puzzle",
         "device_class": None,
     },
+    CONF_SPLIT_DEVICE_TYPE: {
+        "name": "Device Type",
+        "attributes": [ATTR_DEVICE_TYPE],
+        "icon": "mdi:tag",
+        "device_class": None,
+    },
+}
+
+# Display names for configuration options
+CONF_NAMES = {
+    "split_signal_strength": "Split Signal Strength",
+    "split_last_seen": "Split Last Seen",
+    "split_availability": "Split Availability",
+    "split_power_source": "Split Power Source",
+    "split_network_address": "Split Network Address",
+    "split_quirk_info": "Split Quirk Info",
+    "split_device_type": "Split Device Type",
 }
 
 # Default configuration
@@ -91,4 +109,5 @@ DEFAULT_OPTIONS = {
     CONF_SPLIT_POWER: False,
     CONF_SPLIT_NWK: False,
     CONF_SPLIT_QUIRK: False,
+    CONF_SPLIT_DEVICE_TYPE: False,
 }
