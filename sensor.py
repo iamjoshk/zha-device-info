@@ -62,11 +62,12 @@ class ZHADeviceInfoSensor(SensorEntity):
     def __init__(self, hass: HomeAssistant, device, device_registry) -> None:
         """Initialize the sensor."""
         self._device = device
-        # Look up device using ZHA domain connection
+        # Look up device using ZHA domain identifiers
         device_entry = device_registry.async_get_device(
-            connections={(zha.DOMAIN, str(device.ieee))},
+            identifiers={(ZHA_DOMAIN, str(device.ieee))},
         )
         _LOGGER.debug("Device entry from registry: %s", device_entry)
+        _LOGGER.debug("Device entry name_by_user: %s", device_entry.name_by_user if device_entry else None)
         
         # Use name_by_user if available, otherwise use device name
         device_name = device_entry.name_by_user if device_entry and device_entry.name_by_user else device.name
