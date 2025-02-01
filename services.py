@@ -4,7 +4,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.service import async_register_admin_service
 from homeassistant.helpers.json import save_json
 from homeassistant.components import zha
-from homeassistant.components.zha.helpers import async_get_zha_device_proxy
+from homeassistant.components.zha.const import DOMAIN as ZHA_DOMAIN
 
 from .const import DOMAIN, SERVICE_UPDATE, SERVICE_EXPORT, SERVICE_SCHEMAS
 
@@ -16,75 +16,63 @@ async def async_register_services(hass: HomeAssistant) -> None:
     async def handle_update(call) -> None:
         """Update device info."""
         _LOGGER.debug("Updating ZHA device info")
-        _LOGGER.debug("Available domains in hass.data: %s", list(hass.data.keys()))
-        zha_data = hass.data.get(zha.DOMAIN)
-        _LOGGER.debug("ZHA data type: %s", type(zha_data))
+        zha_data = hass.data.get(ZHA_DOMAIN)
         
-        if not zha_data:
-            _LOGGER.error("ZHA data not found in hass.data")
-            return
-            
-        _LOGGER.debug("ZHA gateway_proxy type: %s", type(zha_data.gateway_proxy))
-        if not zha_data.gateway_proxy:
-            _LOGGER.error("ZHA gateway proxy not found in zha_data")
+        if not zha_data or not zha_data.gateway_proxy:
+            _LOGGER.error("ZHA gateway not found")
             return
 
-        _LOGGER.debug("ZHA gateway type: %s", type(zha_data.gateway_proxy.gateway))
+        device_registry = {}
         try:
             for device in zha_data.gateway_proxy.gateway.devices.values():
                 if device is None:
-                    _LOGGER.error("Device is None, skipping")
                     continue
-                _LOGGER.debug("Processing device type: %s", type(device))
-                _LOGGER.debug("Device attributes: %s", dir(device))
-                await update_device_info(hass, device, hass.data[DOMAIN]["device_registry"])
-        except Exception as dev_err:
-            _LOGGER.exception("Error processing devices: %s", dev_err)
+                
+                try:
+                    last_seen = device.last_seen
+                    if isinstance(last_seen, float):
+                        last_seen = datetime.fromtimestamp(last_seen)
 
-        # Update the state of each ZHA Device Info sensor
-        for entity in hass.data[DOMAIN]["entities"]:
-            entity.async_write_ha_state()
-            _LOGGER.debug("Updated state for entity: %s", entity.name)
+                    nwk_hex = f"0x{device.nwk:04x}"
+                    device_info = {
+                        "ieee": str(device.ieee),
+                        "nwk": nwk_hex,
+                        "manufacturer": device.manufacturer,
+                        "model": device.model,
+                        "name": device.name,
+                        "quirk_applied": device.quirk_applied,
+                        "power_source": device.power_source,
+                        "lqi": device.lqi,
+                        "rssi": device.rssi,
+                        "last_seen": last_seen.isoformat() if last_seen else None,
+                        "available": device.available,
+                    }
 
-    async def update_device_info(hass: HomeAssistant, device, device_registry: dict) -> None:
-        """Helper function to update a single device's info."""
-        try:
-            zha_device = async_get_zha_device_proxy(hass, device.ieee)
-            if not zha_device:
-                _LOGGER.error("ZHA device proxy not found for device %s", device.ieee)
-                return
+                    device_registry[str(device.ieee)] = device_info
+                    _LOGGER.debug("Updated info for device %s", device.ieee)
+                except Exception as dev_err:
+                    _LOGGER.error("Error processing device %s: %s", device.ieee, dev_err)
 
-            last_seen = zha_device.device.last_seen
-            if isinstance(last_seen, float):
-                last_seen = datetime.fromtimestamp(last_seen)
+            # Store updated registry
+            hass.data[DOMAIN]["device_registry"] = device_registry
 
-            nwk_hex = f"0x{zha_device.device.nwk:04x}"
-            device_info = {
-                "ieee": str(zha_device.device.ieee),
-                "nwk": nwk_hex,
-                "manufacturer": zha_device.device.manufacturer,
-                "model": zha_device.device.model,
-                "name": zha_device.device.name,
-                "quirk_applied": zha_device.device.quirk_applied,
-                "power_source": zha_device.device.power_source,
-                "lqi": zha_device.device.lqi,
-                "rssi": zha_device.device.rssi,
-                "last_seen": last_seen.isoformat(),
-                "available": zha_device.device.available,
-            }
-
-            device_registry[str(zha_device.device.ieee)] = device_info
-            _LOGGER.debug("Updated info for device %s", zha_device.device.ieee)
-            
+            # Update the state of each ZHA Device Info sensor
+            for entity in hass.data[DOMAIN]["entities"]:
+                entity.async_write_ha_state()
+                
         except Exception as err:
-            _LOGGER.error("Error processing device %s: %s", device.ieee, err)
+            _LOGGER.exception("Error processing devices: %s", err)
 
     async def handle_export(call) -> None:
         """Export device info to JSON."""
         path = call.data.get("path", hass.config.path("zha_devices.json"))
         try:
-            await hass.async_add_executor_job(save_json, path, hass.data[DOMAIN]["device_registry"])
-            _LOGGER.info("Exported ZHA device info to %s", path)
+            device_registry = hass.data[DOMAIN]["device_registry"]
+            if device_registry:
+                await hass.async_add_executor_job(save_json, path, device_registry)
+                _LOGGER.info("Exported ZHA device info to %s", path)
+            else:
+                _LOGGER.error("No device registry data to export")
         except Exception as err:
             _LOGGER.error("Failed to export: %s", err)
 

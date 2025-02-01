@@ -10,7 +10,9 @@ Initial creation and testing
 - Add the integration through the Integration config flow UI.
 - Click Add Entry for the integration to find all of the devices in your ZHA integration and add them to the ZHA Device Info integration.
 
-
+### Actions
+`zha_device_info.update` - updates your ZHA Device Info entities
+`zha_device_info.export` - exports a json file with your ZHA Device Info entity data to the directory with your configuration.yaml file (by default, but configurable)
 
 
 ---

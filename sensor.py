@@ -6,11 +6,10 @@ from datetime import datetime
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.components import zha
-from homeassistant.components.zha.const import DATA_ZHA
+from homeassistant.components.zha.const import DOMAIN as ZHA_DOMAIN
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.device_registry import async_get
 
@@ -26,23 +25,11 @@ async def async_setup_entry(
     """Set up ZHA device info sensors from a config entry."""
     _LOGGER.debug("Setting up ZHA Device Info sensors")
     try:
-        _LOGGER.debug("Available domains in hass.data: %s", list(hass.data.keys()))
-        zha_data = hass.data.get(zha.DOMAIN)
-        _LOGGER.debug("ZHA data type: %s", type(zha_data))
-        _LOGGER.debug("ZHA data attributes: %s", dir(zha_data))
-        
-        if not zha_data:
-            _LOGGER.error("ZHA data not found in hass.data")
-            return
-            
-        _LOGGER.debug("ZHA gateway_proxy type: %s", type(zha_data.gateway_proxy))
-        if not zha_data.gateway_proxy:
-            _LOGGER.error("ZHA gateway proxy not found in zha_data")
+        zha_data = hass.data.get(ZHA_DOMAIN)
+        if not zha_data or not zha_data.gateway_proxy:
+            _LOGGER.error("ZHA gateway not found")
             return
 
-        _LOGGER.debug("ZHA gateway type: %s", type(zha_data.gateway_proxy.gateway))
-        _LOGGER.debug("Available gateway attributes: %s", dir(zha_data.gateway_proxy.gateway))
-        
         if DOMAIN not in hass.data:
             hass.data[DOMAIN] = {"entities": []}
         
@@ -51,12 +38,8 @@ async def async_setup_entry(
         entities = []
         for device in zha_data.gateway_proxy.gateway.devices.values():
             if device is None:
-                _LOGGER.error("Device is None, skipping")
                 continue
-            _LOGGER.debug("Device type: %s", type(device))
-            _LOGGER.debug("Device attributes: %s", dir(device))
-            _LOGGER.debug("Adding ZHA Device Info sensor for device: %s", device.name)
-            
+                
             try:
                 entity = ZHADeviceInfoSensor(hass, device, device_registry)
                 entities.append(entity)
@@ -68,7 +51,7 @@ async def async_setup_entry(
         async_add_entities(entities, True)
         _LOGGER.debug("ZHA Device Info sensors setup complete")
     except Exception as err:
-        _LOGGER.exception("Error setting up ZHA Device Info sensors: %s", err, exc_info=True)
+        _LOGGER.exception("Error setting up ZHA Device Info sensors: %s", err)
 
 
 class ZHADeviceInfoSensor(SensorEntity):
