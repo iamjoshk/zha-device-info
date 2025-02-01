@@ -48,6 +48,16 @@ async def async_register_services(hass: HomeAssistant) -> None:
                         "available": device.available,
                     }
 
+                    # Add quirk_class if quirk is applied
+                    if device.quirk_applied:
+                        quirk = device.quirk_class
+                        if isinstance(quirk, str):
+                            device_info["quirk_class"] = quirk
+                        elif hasattr(quirk, "__name__"):
+                            device_info["quirk_class"] = quirk.__name__
+                        else:
+                            device_info["quirk_class"] = str(quirk)
+
                     device_registry[str(device.ieee)] = device_info
                     _LOGGER.debug("Updated info for device %s", device.ieee)
                 except Exception as dev_err:

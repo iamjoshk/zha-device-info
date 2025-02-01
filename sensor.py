@@ -95,7 +95,7 @@ class ZHADeviceInfoSensor(SensorEntity):
                 last_seen = datetime.fromtimestamp(last_seen)
             nwk_hex = f"0x{self._device.nwk:04x}"
             attributes = {
-                ATTR_IEEE: ieee,  # Access through device
+                ATTR_IEEE: ieee,
                 ATTR_NWK: nwk_hex,
                 ATTR_MANUFACTURER: self._device.manufacturer,
                 ATTR_MODEL: self._device.model,
@@ -107,6 +107,17 @@ class ZHADeviceInfoSensor(SensorEntity):
                 ATTR_LAST_SEEN: last_seen.isoformat(),
                 ATTR_AVAILABLE: self._device.available
             }
+
+            # Add quirk_class if quirk is applied
+            if self._device.quirk_applied:
+                quirk = self._device.quirk_class
+                if isinstance(quirk, str):
+                    attributes["quirk_class"] = quirk
+                elif hasattr(quirk, "__name__"):
+                    attributes["quirk_class"] = quirk.__name__
+                else:
+                    attributes["quirk_class"] = str(quirk)
+
             _LOGGER.debug("Attributes for device %s: %s", self._device.name, attributes)
             return attributes
         except Exception as err:
