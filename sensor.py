@@ -98,10 +98,10 @@ class ZHADeviceInfoSensor(SensorEntity):
         device_name = device_entry.name_by_user if device_entry and device_entry.name_by_user else device.name
         _LOGGER.debug("Using name for device %s: %s", device.ieee, device_name)
         
-        # Format entity name with DOMAIN prefix
-        self._attr_name = f"{DOMAIN} {device_name}"
+        # Simplified friendly name
+        self._attr_name = device_name
         self._attr_unique_id = f"{DOMAIN}_{device.ieee}"
-        # Update entity_id format
+        # Keep the full entity_id format
         self.entity_id = async_generate_entity_id(
             "sensor.{}",
             f"zha_device_info_{device_name.lower().replace(' ', '_')}",
@@ -174,10 +174,10 @@ class ZHADeviceAttributeSensor(SensorEntity):
         )
         device_name = device_entry.name_by_user if device_entry and device_entry.name_by_user else device.name
         
-        # Format entity name with DOMAIN prefix
-        self._attr_name = f"{DOMAIN} {device_name} {conf_data['name']}"
+        # Simplified friendly name
+        self._attr_name = f"{device_name} {conf_data['name']}"
         self._attr_unique_id = f"{DOMAIN}_{device.ieee}_{conf_data['name']}"
-        # Update entity_id format
+        # Keep the full entity_id format
         self.entity_id = async_generate_entity_id(
             "sensor.{}",
             f"zha_device_info_{device_name.lower().replace(' ', '_')}_{conf_data['name'].lower().replace(' ', '_')}",
