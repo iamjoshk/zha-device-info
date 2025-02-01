@@ -3,8 +3,10 @@
 import logging
 from typing import Any, Dict, Optional
 from datetime import datetime
+import time
 
 from homeassistant.components.sensor import SensorEntity
+from homeassistant.util import dt as dt_util
 from homeassistant.components import zha
 from homeassistant.components.zha.const import DOMAIN as ZHA_DOMAIN
 from homeassistant.core import HomeAssistant
@@ -12,8 +14,21 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.device_registry import async_get
+from homeassistant.const import (
+    SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
+    PERCENTAGE,
+)
 
-from .const import DOMAIN, ATTR_IEEE, ATTR_NWK, ATTR_MANUFACTURER, ATTR_MODEL, ATTR_NAME, ATTR_QUIRK_APPLIED, ATTR_POWER_SOURCE, ATTR_LQI, ATTR_RSSI, ATTR_LAST_SEEN, ATTR_AVAILABLE
+from .const import (
+    DOMAIN, ATTR_IEEE, ATTR_NWK, 
+    ATTR_MANUFACTURER, ATTR_MODEL, 
+    ATTR_NAME, ATTR_QUIRK_APPLIED, 
+    ATTR_QUIRK_CLASS, ATTR_POWER_SOURCE, 
+    ATTR_LQI, ATTR_RSSI, ATTR_LAST_SEEN, 
+    ATTR_AVAILABLE, SPLITTABLE_ATTRIBUTES,
+    DEFAULT_OPTIONS
+)
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -41,10 +56,20 @@ async def async_setup_entry(
                 continue
                 
             try:
-                entity = ZHADeviceInfoSensor(hass, device, device_registry)
-                entities.append(entity)
-                hass.data[DOMAIN]["entities"].append(entity)
-                _LOGGER.debug("Added ZHA Device Info sensor for device: %s", device.name)
+                # Add main sensor
+                main_entity = ZHADeviceInfoSensor(hass, device, device_registry)
+                entities.append(main_entity)
+                
+                # Add split attribute sensors based on config
+                for conf, conf_data in SPLITTABLE_ATTRIBUTES.items():
+                    if entry.options.get(conf, DEFAULT_OPTIONS[conf]):
+                        entity = ZHADeviceAttributeSensor(
+                            hass, device, device_registry, conf_data
+                        )
+                        entities.append(entity)
+                        
+                hass.data[DOMAIN]["entities"].extend(entities)
+                
             except Exception as entity_err:
                 _LOGGER.exception("Error creating sensor for device %s: %s", device.name, entity_err)
 
@@ -73,9 +98,16 @@ class ZHADeviceInfoSensor(SensorEntity):
         device_name = device_entry.name_by_user if device_entry and device_entry.name_by_user else device.name
         _LOGGER.debug("Using name for device %s: %s", device.ieee, device_name)
         
-        self._attr_name = f"ZHA Device Info {device_name}"
+        # Format entity name with DOMAIN prefix
+        self._attr_name = f"{DOMAIN} {device_name}"
         self._attr_unique_id = f"{DOMAIN}_{device.ieee}"
-        self.entity_id = async_generate_entity_id("sensor.{}", self._attr_name.lower().replace(" ", "_"), hass=hass)
+        # Update entity_id format
+        self.entity_id = async_generate_entity_id(
+            "sensor.{}",
+            f"zha_device_info_{device_name.lower().replace(' ', '_')}",
+            hass=hass
+        )
+        
         self._attr_device_info = {
             "identifiers": {(DOMAIN, str(device.ieee))},
             "name": device_name,
@@ -127,4 +159,91 @@ class ZHADeviceInfoSensor(SensorEntity):
     @property
     def state(self) -> str:
         """Return the state of the sensor."""
-        return datetime.now().isoformat()
+        return str(self._device.ieee)
+
+
+class ZHADeviceAttributeSensor(SensorEntity):
+    """Representation of a ZHA Device attribute sensor."""
+
+    def __init__(self, hass, device, device_registry, conf_data):
+        """Initialize the sensor."""
+        self._device = device
+        self._conf_data = conf_data
+        device_entry = device_registry.async_get_device(
+            identifiers={(ZHA_DOMAIN, str(device.ieee))},
+        )
+        device_name = device_entry.name_by_user if device_entry and device_entry.name_by_user else device.name
+        
+        # Format entity name with DOMAIN prefix
+        self._attr_name = f"{DOMAIN} {device_name} {conf_data['name']}"
+        self._attr_unique_id = f"{DOMAIN}_{device.ieee}_{conf_data['name']}"
+        # Update entity_id format
+        self.entity_id = async_generate_entity_id(
+            "sensor.{}",
+            f"zha_device_info_{device_name.lower().replace(' ', '_')}_{conf_data['name'].lower().replace(' ', '_')}",
+            hass=hass
+        )
+        
+        self._attr_icon = conf_data["icon"]
+        self._attr_device_class = conf_data.get("device_class")
+        self._attr_state_class = conf_data.get("state_class")
+        
+        # Only set unit of measurement for numeric sensors
+        if "signal_strength" in conf_data["name"].lower():
+            self._attr_native_unit_of_measurement = SIGNAL_STRENGTH_DECIBELS_MILLIWATT
+        elif "lqi" in conf_data["attributes"]:
+            self._attr_native_unit_of_measurement = PERCENTAGE
+        
+        # Set device info
+        self._attr_device_info = {
+            "identifiers": {(DOMAIN, str(device.ieee))},
+            "name": device_name,
+            "manufacturer": device.manufacturer,
+            "model": device.model,
+        }
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        try:
+            if "rssi" in self._conf_data["attributes"]:
+                return self._device.rssi
+            elif "lqi" in self._conf_data["attributes"]:
+                return self._device.lqi
+            elif "last_seen" in self._conf_data["attributes"]:
+                last_seen = self._device.last_seen
+                if isinstance(last_seen, float):
+                    return dt_util.as_local(datetime.fromtimestamp(last_seen))
+                return last_seen
+            elif "available" in self._conf_data["attributes"]:
+                return self._device.available
+            elif "power_source" in self._conf_data["attributes"]:
+                return str(self._device.power_source)
+            elif ATTR_NWK in self._conf_data["attributes"]:
+                return f"0x{self._device.nwk:04x}"
+            elif ATTR_QUIRK_APPLIED in self._conf_data["attributes"]:
+                return self._device.quirk_applied  # Return quirk_applied as state
+            return None
+        except Exception as err:
+            _LOGGER.error(
+                "Error getting native value for device %s: %s",
+                self._device.name,
+                err,
+            )
+            return None
+
+    @property
+    def extra_state_attributes(self) -> Dict[str, Any]:
+        """Return additional attributes based on the sensor type."""
+        attributes = {}
+        if ATTR_QUIRK_APPLIED in self._conf_data["attributes"]:
+            # Add quirk name as attribute if quirk is applied
+            if self._device.quirk_applied:
+                quirk = self._device.quirk_class
+                if isinstance(quirk, str):
+                    attributes[ATTR_QUIRK_CLASS] = quirk
+                elif hasattr(quirk, "__name__"):
+                    attributes[ATTR_QUIRK_CLASS] = quirk.__name__
+                else:
+                    attributes[ATTR_QUIRK_CLASS] = str(quirk)
+        return attributes
