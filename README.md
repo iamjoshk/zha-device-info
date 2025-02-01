@@ -16,4 +16,4 @@ Initial creation and testing
 
 
 ---
-Uses dmulcahey's https://github.com/dmulcahey/zha-device-exporter as launch pad.
+Uses dmulcahey's https://github.com/dmulcahey/zha-device-exporter as launch pad for idea.
