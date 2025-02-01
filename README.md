@@ -12,7 +12,7 @@ Initial creation and testing
 
 ### Actions
 `zha_device_info.update` - updates your ZHA Device Info entities
-`zha_device_info.export` - exports a json file with your ZHA Device Info entity data to the directory with your configuration.yaml file (by default, but configurable)
+`zha_device_info.export` - exports a json file with your ZHA Device Info entity data to /config/zha_devices.json (by default, but configurable)
 
 
 ---
