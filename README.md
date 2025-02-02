@@ -44,4 +44,4 @@ The integration creates two new actions under Developer Tools -> Actions
 
 ---
 Credit:
-This integration used @dmulcahey's https://github.com/dmulcahey/zha-device-exporter as the seed for the idea.
+This integration used dmulcahey's https://github.com/dmulcahey/zha-device-exporter as the seed for the idea.
