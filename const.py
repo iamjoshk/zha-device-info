@@ -3,7 +3,7 @@
 import voluptuous as vol
 
 DOMAIN = "zha_device_info"
-PLATFORMS = ["sensor"]
+PLATFORMS = ["sensor", "binary_sensor"]
 
 # Service names
 SERVICE_UPDATE = "update"
@@ -36,7 +36,6 @@ ATTR_CLUSTER_DETAILS = "cluster_details"
 ATTR_ENDPOINTS = "endpoints"
 
 # Splittable Attributes Configuration
-CONF_SPLIT_SIGNAL_STRENGTH = "split_signal_strength"  # Changed format
 CONF_SPLIT_LAST_SEEN = "split_last_seen"  # Changed format
 CONF_SPLIT_AVAILABILITY = "split_availability"  # Changed format
 CONF_SPLIT_POWER = "split_power_source"  # Changed format
@@ -45,23 +44,11 @@ CONF_SPLIT_QUIRK = "split_quirk_info"  # Changed format
 CONF_SPLIT_DEVICE_TYPE = "split_device_type"  # Changed format
 
 SPLITTABLE_ATTRIBUTES = {
-    CONF_SPLIT_SIGNAL_STRENGTH: {
-        "name": "Signal Strength",
-        "attributes": [ATTR_LQI, ATTR_RSSI],
-        "icon": "mdi:signal",
-        "device_class": None,
-    },
     CONF_SPLIT_LAST_SEEN: {
         "name": "Last Seen",
         "attributes": [ATTR_LAST_SEEN],
         "icon": "mdi:clock-outline",
         "device_class": "timestamp",
-    },
-    CONF_SPLIT_AVAILABILITY: {
-        "name": "Availability",
-        "attributes": [ATTR_AVAILABLE],
-        "icon": "mdi:check-network-outline",
-        "device_class": "connectivity",
     },
     CONF_SPLIT_POWER: {
         "name": "Power Source",
@@ -76,23 +63,31 @@ SPLITTABLE_ATTRIBUTES = {
         "icon": "mdi:identifier",
         "device_class": None,
     },
-    CONF_SPLIT_QUIRK: {
-        "name": "Quirk Info",
-        "attributes": [ATTR_QUIRK_APPLIED, ATTR_QUIRK_CLASS],
-        "icon": "mdi:puzzle",
-        "device_class": None,
-    },
     CONF_SPLIT_DEVICE_TYPE: {
         "name": "Device Type",
         "attributes": [ATTR_DEVICE_TYPE],
         "icon": "mdi:tag",
         "device_class": None,
     },
+    # Keep these in SPLITTABLE_ATTRIBUTES for config flow
+    CONF_SPLIT_AVAILABILITY: {
+        "name": "Availability",
+        "attributes": [ATTR_AVAILABLE],
+        "icon": "mdi:check-network-outline",
+        "device_class": None,
+        "platform": "binary_sensor",  # Add platform identifier
+    },
+    CONF_SPLIT_QUIRK: {
+        "name": "Quirk Info",
+        "attributes": [ATTR_QUIRK_APPLIED, ATTR_QUIRK_CLASS],
+        "icon": "mdi:puzzle",
+        "device_class": None,
+        "platform": "binary_sensor",  # Add platform identifier
+    },
 }
 
 # Display names for configuration options
 CONF_NAMES = {
-    "split_signal_strength": "Split Signal Strength",
     "split_last_seen": "Split Last Seen",
     "split_availability": "Split Availability",
     "split_power_source": "Split Power Source",
@@ -103,7 +98,6 @@ CONF_NAMES = {
 
 # Default configuration
 DEFAULT_OPTIONS = {
-    CONF_SPLIT_SIGNAL_STRENGTH: False,
     CONF_SPLIT_LAST_SEEN: False,
     CONF_SPLIT_AVAILABILITY: False,
     CONF_SPLIT_POWER: False,

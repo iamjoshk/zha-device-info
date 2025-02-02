@@ -63,6 +63,9 @@ async def async_setup_entry(
                 # Add split attribute sensors based on config
                 for conf, conf_data in SPLITTABLE_ATTRIBUTES.items():
                     if entry.options.get(conf, DEFAULT_OPTIONS[conf]):
+                        # Skip if this is a binary sensor
+                        if conf_data.get("platform") == "binary_sensor":
+                            continue
                         entity = ZHADeviceAttributeSensor(
                             hass, device, device_registry, conf_data
                         )
@@ -189,12 +192,6 @@ class ZHADeviceAttributeSensor(SensorEntity):
         self._attr_device_class = conf_data.get("device_class")
         self._attr_state_class = conf_data.get("state_class")
         
-        # Only set unit of measurement for numeric sensors
-        if "signal_strength" in conf_data["name"].lower():
-            self._attr_native_unit_of_measurement = SIGNAL_STRENGTH_DECIBELS_MILLIWATT
-        elif "lqi" in conf_data["attributes"]:
-            self._attr_native_unit_of_measurement = PERCENTAGE
-        
         # Set device info
         self._attr_device_info = {
             "identifiers": {(DOMAIN, str(device.ieee))},
@@ -211,12 +208,7 @@ class ZHADeviceAttributeSensor(SensorEntity):
                 _LOGGER.debug("Device is None")
                 return None
 
-            # Ensure device has necessary attributes before accessing them
-            if "rssi" in self._conf_data["attributes"]:
-                return getattr(self._device, "rssi", None)
-            elif "lqi" in self._conf_data["attributes"]:
-                return getattr(self._device, "lqi", None)
-            elif "last_seen" in self._conf_data["attributes"]:
+            if "last_seen" in self._conf_data["attributes"]:
                 last_seen = getattr(self._device, "last_seen", None)
                 if isinstance(last_seen, float):
                     return dt_util.as_local(datetime.fromtimestamp(last_seen))
