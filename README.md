@@ -6,8 +6,8 @@ Initial creation and testing
 
 ## To add as a custom integration:
 - download the zip
-- in your config directory, under custom_components, extract zip to zha_device_info folder.
-- Add the integration through the Integration config flow UI.
+- in your config directory, under custom_components, extract zip to zha_device_info folder, then restart HA.
+- after restart, under Integrations, click Add Integration, then search and select ZHA Device Info from list.
 - Click Add Entry for the integration to find all of the devices in your ZHA integration and add them to the ZHA Device Info integration.
 
 ### Configure
@@ -28,14 +28,13 @@ Initial creation and testing
         - Last Seen
         - Available
         - Device Type
-- During set up (and later by clicking configure), you can choose to create separate entities for some of the attributes. These attributes are:
-    - Signal Strength: LQI (as state) and RSSI (as attribute)
-    - Last Seen: Last Seen as state
-    - Availability: Available as state
-    - Power Source: Power Source as state
-    - Network Adress: NWK address as hex
-    - Quirk Info: Quirk Applied (as state) and Quirk Class (as attribute)
-    - Device Type: Device Type as state
+- During set up (and later by clicking configure), you can choose to create separate entities for some of the attributes. The following entities can be created:
+    - Last Seen: as a sensor with  Last Seen as state
+    - Availability: as a binary sensor with Available as state
+    - Power Source: as a sensor with Power Source as state
+    - Network Adress: as a sensor with hex NWK address as state
+    - Quirk Info: as a binary sensor with Quirk Applied (as state) and Quirk Class (as attribute)
+    - Device Type: as sensor Device Type as state
 
 ### Actions
 `zha_device_info.update` - updates your ZHA Device Info entities
