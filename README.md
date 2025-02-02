@@ -1,7 +1,7 @@
 # zha-device-info
 ZHA zigbee device info as sensors in HA
 
-## version 0.0.1
+## version 0.1.0
 Initial creation and testing
 
 ## To add as a custom integration:
