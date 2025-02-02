@@ -207,30 +207,38 @@ class ZHADeviceAttributeSensor(SensorEntity):
     def native_value(self):
         """Return the state of the sensor."""
         try:
+            if not self._device:
+                _LOGGER.debug("Device is None")
+                return None
+
+            # Ensure device has necessary attributes before accessing them
             if "rssi" in self._conf_data["attributes"]:
-                return self._device.rssi
+                return getattr(self._device, "rssi", None)
             elif "lqi" in self._conf_data["attributes"]:
-                return self._device.lqi
+                return getattr(self._device, "lqi", None)
             elif "last_seen" in self._conf_data["attributes"]:
-                last_seen = self._device.last_seen
+                last_seen = getattr(self._device, "last_seen", None)
                 if isinstance(last_seen, float):
                     return dt_util.as_local(datetime.fromtimestamp(last_seen))
                 return last_seen
             elif "available" in self._conf_data["attributes"]:
-                return self._device.available
+                return getattr(self._device, "available", None)
             elif "power_source" in self._conf_data["attributes"]:
-                return str(self._device.power_source)
+                return str(getattr(self._device, "power_source", None))
             elif ATTR_NWK in self._conf_data["attributes"]:
-                return f"0x{self._device.nwk:04x}"
+                nwk = getattr(self._device, "nwk", None)
+                return f"0x{nwk:04x}" if nwk is not None else None
             elif ATTR_QUIRK_APPLIED in self._conf_data["attributes"]:
-                return self._device.quirk_applied  # Return quirk_applied as state
+                return getattr(self._device, "quirk_applied", False)
             elif ATTR_DEVICE_TYPE in self._conf_data["attributes"]:
-                return str(self._device.device_type)  # Add device type handling
+                device_type = getattr(self._device, "device_type", None)
+                return str(device_type) if device_type is not None else None
             return None
+
         except Exception as err:
             _LOGGER.error(
                 "Error getting native value for device %s: %s",
-                self._device.name,
+                getattr(self._device, "name", "Unknown"),
                 err,
             )
             return None

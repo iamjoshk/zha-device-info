@@ -49,7 +49,7 @@ SPLITTABLE_ATTRIBUTES = {
         "name": "Signal Strength",
         "attributes": [ATTR_LQI, ATTR_RSSI],
         "icon": "mdi:signal",
-        "device_class": "signal_strength",
+        "device_class": None,
     },
     CONF_SPLIT_LAST_SEEN: {
         "name": "Last Seen",
