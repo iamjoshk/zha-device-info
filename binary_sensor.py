@@ -13,7 +13,7 @@ from homeassistant.components.zha.const import DOMAIN as ZHA_DOMAIN
 
 from .const import (
     DOMAIN,
-    BINARY_SENSORS,
+    SPLITTABLE_ATTRIBUTES,
     DEFAULT_OPTIONS,
     ATTR_QUIRK_CLASS,
     ATTR_QUIRK_APPLIED,
@@ -41,7 +41,14 @@ async def async_setup_entry(
                 continue
                 
             try:
-                for conf, conf_data in BINARY_SENSORS.items():
+                # Only process binary sensor platform configurations
+                binary_sensor_configs = {
+                    conf: conf_data 
+                    for conf, conf_data in SPLITTABLE_ATTRIBUTES.items()
+                    if conf_data.get("platform") == "binary_sensor"
+                }
+                
+                for conf, conf_data in binary_sensor_configs.items():
                     if entry.options.get(conf, DEFAULT_OPTIONS[conf]):
                         entity = ZHADeviceBinarySensor(
                             hass, device, device_registry, conf_data
