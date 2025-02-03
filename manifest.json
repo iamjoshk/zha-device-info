@@ -1,7 +1,7 @@
 {
   "domain": "zha_device_info",
   "name": "ZHA Device Info",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "documentation": "https://github.com/iamjoshk/zha-device-info",
   "requirements": ["python-slugify"],
   "dependencies": [],
@@ -9,8 +9,6 @@
   "codeowners": ["@iamjoshk"],
   "iot_class": "local_polling",
   "config_flow": true,
-  "services": "services.yaml",
-  "icon": "icon.png",
-  "logo": "icon.png"
+  "services": "services.yaml"
 }
 
