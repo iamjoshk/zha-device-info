@@ -41,8 +41,8 @@ Initial creation and testing
 
 ### Actions
 The integration creates two new actions under Developer Tools -> Actions
-`zha_device_info.update` - updates your ZHA Device Info entities.
-`zha_device_info.export` - exports a json file with your ZHA Device Info entity data to /config/zha_devices.json (by default, but configurable)
+- `zha_device_info.update` - updates your ZHA Device Info entities.
+- `zha_device_info.export` - exports a json file with your ZHA Device Info entity data to /config/zha_devices.json (by default, but configurable)
 
 
 ### Using [flex-table-card](https://github.com/custom-cards/flex-table-card) to display ZHA Device Info
