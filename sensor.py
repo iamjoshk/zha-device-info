@@ -104,10 +104,10 @@ class ZHADeviceInfoSensor(SensorEntity):
         # Change friendly name to "ZHA Device Info"
         self._attr_name = "ZHA Device Info"
         self._attr_unique_id = f"{DOMAIN}_{device.ieee}"
-        # Keep the full entity_id format
+        # Change entity_id to include 'entity'
         self.entity_id = async_generate_entity_id(
             "sensor.{}",
-            f"zha_device_info_{device_name.lower().replace(' ', '_')}",
+            f"zha_device_info_entity_{device_name.lower().replace(' ', '_')}",
             hass=hass
         )
         
