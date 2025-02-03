@@ -45,6 +45,29 @@ The integration creates two new actions under Developer Tools -> Actions
 `zha_device_info.export` - exports a json file with your ZHA Device Info entity data to /config/zha_devices.json (by default, but configurable)
 
 
+### Using [flex-table-card](https://github.com/custom-cards/flex-table-card) to display ZHA Device Info
+- install [flex-table-card](https://github.com/custom-cards/flex-table-card) from HACS
+- On your dashboard, add flex-table-card and add the entities you want to display.
+    - Example:
+        ```
+        type: custom:flex-table-card
+        title: Zigbee Device Info
+        clickable: true
+        entities:
+        include:
+          - sensor.zha_device_info_entity*
+        columns:
+        - data: device
+          name: Device Name
+        - data: ieee
+          name: IEEE
+        - data: nwk
+          name: NWK
+        - data: device_type
+          name: Type
+        ```
+
+
 ---
 Credit:
 This integration used dmulcahey's https://github.com/dmulcahey/zha-device-exporter as the seed for the idea.
