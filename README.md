@@ -12,7 +12,7 @@ Initial creation and testing
 
 ### Configure
 - When you add a new Entry, it will automatically find devices through your ZHA integration.
-- By default, each ZHA device will create a ZHA Device Info device with a single, primary entity. This entity will have the device's ZHA info as attributes.
+- By default, a new ZHA Device Info entity will be created in each ZHA device. This entity will have the device's Zigbee info as attributes.
     - Primary entity will use the IEEE as its state.
     - Attributes will be:
         - IEEE
@@ -28,7 +28,7 @@ Initial creation and testing
         - Last Seen
         - Available
         - Device Type
-- During set up (and later by clicking configure), you can choose to create separate entities for some of the attributes. The following entities can be created:
+- During set up (and later by clicking configure), you can choose to create separate entities for some of the attributes. The following entities can be created in the ZHA device:
     - Last Seen: as a `sensor` with  Last Seen as state
     - Availability: as a `binary_sensor` with Available as state
     - Power Source: as a `sensor` with Power Source as state

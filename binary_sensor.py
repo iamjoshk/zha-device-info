@@ -90,11 +90,9 @@ class ZHADeviceBinarySensor(BinarySensorEntity):
         self._attr_icon = conf_data["icon"]
         self._attr_device_class = conf_data.get("device_class")
         
+        # Point to ZHA device
         self._attr_device_info = {
-            "identifiers": {(DOMAIN, str(device.ieee))},
-            "name": device_name,
-            "manufacturer": device.manufacturer,
-            "model": device.model,
+            "identifiers": {(ZHA_DOMAIN, str(device.ieee))},
         }
 
     @property

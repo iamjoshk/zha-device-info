@@ -101,8 +101,8 @@ class ZHADeviceInfoSensor(SensorEntity):
         device_name = device_entry.name_by_user if device_entry and device_entry.name_by_user else device.name
         _LOGGER.debug("Using name for device %s: %s", device.ieee, device_name)
         
-        # Simplified friendly name
-        self._attr_name = device_name
+        # Change friendly name to "ZHA Device Info"
+        self._attr_name = "ZHA Device Info"
         self._attr_unique_id = f"{DOMAIN}_{device.ieee}"
         # Keep the full entity_id format
         self.entity_id = async_generate_entity_id(
@@ -111,11 +111,9 @@ class ZHADeviceInfoSensor(SensorEntity):
             hass=hass
         )
         
+        # Point to ZHA device instead of creating new one
         self._attr_device_info = {
-            "identifiers": {(DOMAIN, str(device.ieee))},
-            "name": device_name,
-            "manufacturer": device.manufacturer,
-            "model": device.model,
+            "identifiers": {(ZHA_DOMAIN, str(device.ieee))},
         }
         _LOGGER.debug("Initialized ZHA Device Info sensor: %s", self._attr_name)
         
@@ -192,12 +190,9 @@ class ZHADeviceAttributeSensor(SensorEntity):
         self._attr_device_class = conf_data.get("device_class")
         self._attr_state_class = conf_data.get("state_class")
         
-        # Set device info
+        # Point to ZHA device instead of creating new one
         self._attr_device_info = {
-            "identifiers": {(DOMAIN, str(device.ieee))},
-            "name": device_name,
-            "manufacturer": device.manufacturer,
-            "model": device.model,
+            "identifiers": {(ZHA_DOMAIN, str(device.ieee))},
         }
 
     @property
