@@ -6,8 +6,8 @@
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/iamjoshk/zha-device-info",
-  "issue_tracker": "https://github.com/iamjoshk/zha-device-info/issues",
   "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/iamjoshk/zha-device-info/issues",
   "requirements": ["python-slugify"],
   "version": "0.3.0-beta"
 }
