@@ -76,7 +76,6 @@ The integration creates two new actions under Developer Tools -> Actions
         ```
 
 
-> For my own convenience, I forked flex-table-card to add a search box to the top of the card that lets me filter the table to show me rows that I want to see (like when I want to search for a NWK ID because of an error message in the log). My fork: https://github.com/iamjoshk/flex-table-card
 
 ---
 Credit:
