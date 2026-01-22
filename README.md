@@ -1,7 +1,7 @@
 # zha-device-info
 ZHA zigbee device info as sensors in HA
 
-## version 0.3.0
+## version 0.3.0-beta
 Install is now HACS compatible.
 
 ## version 0.2.0
