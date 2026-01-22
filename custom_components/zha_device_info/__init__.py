@@ -6,11 +6,14 @@ from homeassistant.components import zha
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
+from homeassistant.helpers import config_validation as cv
 
 from .const import DOMAIN, PLATFORMS, SERVICE_UPDATE
 from .services import async_register_services
 
 _LOGGER = logging.getLogger(__name__)
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up ZHA Device Info."""
