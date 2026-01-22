@@ -1,8 +1,5 @@
 import logging
-from typing import Any
-from datetime import datetime
 
-from homeassistant.components import zha
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.const import EVENT_HOMEASSISTANT_STARTED

@@ -1,9 +1,8 @@
 """ZHA Device Info sensor platform."""
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 from datetime import datetime
-import time
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.util import dt as dt_util
@@ -14,10 +13,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.device_registry import async_get
-from homeassistant.const import (
-    SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
-    PERCENTAGE,
-)
 
 from .const import (
     DOMAIN, ATTR_DEVICE_TYPE, ATTR_IEEE, ATTR_NWK, 
