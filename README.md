@@ -1,17 +1,25 @@
 # zha-device-info
 ZHA zigbee device info as sensors in HA
 
+## version 0.3.0-beta
+Install is now HACS compatible.
+
 ## version 0.2.0
 Moved ZHA Device Info entities into their corresponding devices in the ZHA integration.
 
 ### version 0.1.0
 Initial creation and testing
 
-## To add as a custom integration:
-- download the zip
-- in your config directory, under custom_components, extract zip to zha_device_info folder, then restart HA.
-- after restart, under Integrations, click Add Integration, then search and select ZHA Device Info from list.
-- Click Add Entry for the integration to find all of the devices in your ZHA integration and add them to the ZHA Device Info integration.
+## To add via HACS:
+- copy the URL of this repo: https://github.com/iamjoshk/zha-device-info
+- Go to your HACS dashboard and click the three dots menu in the top right
+- select Custom repositories
+- paste the URL into the Repository field and select Integration from the type dropdown
+- click Add
+
+Once the custom repo is added, then search for ZHA Device Info in the HACS dashboard and click. Then download it and restart Home Assistant.
+
+Once HA restarts, go to Integrations and click Add Integration, then search for ZHA Device Info and add the integration.
 
 ### Configure
 - When you add a new Entry, it will automatically find devices through your ZHA integration.
@@ -68,7 +76,6 @@ The integration creates two new actions under Developer Tools -> Actions
         ```
 
 
-> For my own convenience, I forked flex-table-card to add a search box to the top of the card that lets me filter the table to show me rows that I want to see (like when I want to search for a NWK ID because of an error message in the log). My fork: https://github.com/iamjoshk/flex-table-card
 
 ---
 Credit:
