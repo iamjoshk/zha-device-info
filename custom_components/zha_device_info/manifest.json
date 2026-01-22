@@ -1,13 +1,13 @@
 {
   "domain": "zha_device_info",
   "name": "ZHA Device Info",
-  "version": "0.2.0",
-  "documentation": "https://github.com/iamjoshk/zha-device-info",
-  "requirements": ["python-slugify"],
-  "dependencies": [],
   "after_dependencies": ["zha"],
   "codeowners": ["@iamjoshk"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/iamjoshk/zha-device-info",
   "iot_class": "local_polling",
-  "config_flow": true
+  "requirements": ["python-slugify"],
+  "version": "0.2.0"
 }
 
