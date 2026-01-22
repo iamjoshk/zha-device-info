@@ -13,8 +13,8 @@ Initial creation and testing
 ## To add via HACS:
 - copy the URL of this repo: https://github.com/iamjoshk/zha-device-info
 - Go to your HACS dashboard and click the three dots menu in the top right
-- select Custom respositories
-- paste the URL into the Respository field and select Integration from the type dropdown
+- select Custom repositories
+- paste the URL into the Repository field and select Integration from the type dropdown
 - click Add
 
 Once the custom repo is added, then search for ZHA Device Info in the HACS dashboard and click. Then download it and restart Home Assistant.
