@@ -1,0 +1,32 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Create sensors from selected attributes",
+        "data": {
+          "split_last_seen": "Last Seen",
+          "split_power_source": "Power Source",
+          "split_network_address": "Network Address",
+          "split_device_type": "Device Type",
+          "split_availability": "Availability",
+          "split_quirk_info": "Quirk Info"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Create sensors from selected attributes",
+        "data": {
+          "split_last_seen": "Last Seen",
+          "split_power_source": "Power Source",
+          "split_network_address": "Network Address",
+          "split_device_type": "Device Type",
+          "split_availability": "Availability",
+          "split_quirk_info": "Quirk Info"
+        }
+      }
+    }
+  }
+}

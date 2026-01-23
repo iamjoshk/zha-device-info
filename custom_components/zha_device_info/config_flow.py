@@ -35,7 +35,6 @@ class ZHADeviceInfoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Optional(
                         conf,
                         default=DEFAULT_OPTIONS[conf],
-                        description=CONF_NAMES[conf],
                     ): bool
                     for conf in SPLITTABLE_ATTRIBUTES
                 }
@@ -71,7 +70,6 @@ class ZHADeviceInfoOptionsFlow(config_entries.OptionsFlow):
                     vol.Optional(
                         conf,
                         default=self.options.get(conf, DEFAULT_OPTIONS[conf]),
-                        description=CONF_NAMES[conf],
                     ): bool
                     for conf in SPLITTABLE_ATTRIBUTES
                 }
