@@ -8,9 +8,9 @@ ZHA zigbee device info as sensors in HA
 Added translation strings
 
 ### Past versions
-v0.3.0 - made custom integration HACS compatible
-v0.2.0 - Moved ZHA Device Info entities into their corresponding devices in the ZHA integration.
-v0.1.0 - Initial creation and testing
+- v0.3.0 - made custom integration HACS compatible
+- v0.2.0 - Moved ZHA Device Info entities into their corresponding devices in the ZHA integration.
+- v0.1.0 - Initial creation and testing
 
 ## To add via HACS:
 - copy the URL of this repo: https://github.com/iamjoshk/zha-device-info
