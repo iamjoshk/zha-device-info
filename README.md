@@ -13,6 +13,11 @@ Added translation strings
 - v0.1.0 - Initial creation and testing
 
 ## To add via HACS:
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=iamjoshk&repository=zha-device-info&category=integration)
+
+or
+
 - copy the URL of this repo: https://github.com/iamjoshk/zha-device-info
 - Go to your HACS dashboard and click the three dots menu in the top right
 - select Custom repositories
