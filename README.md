@@ -1,6 +1,13 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
 [![GitHub release](https://img.shields.io/github/release/iamjoshk/zha-device-info.svg)](https://github.com/iamjoshk/zha-device-info/releases)
 
+# NOTE FOR HA 2026.8
+Prior to HA core version 2026.8, devices that were set up through more than one integration were merged into a single device. ZHA Device Info took advantage of this to merge device info into your ZHA devices. Since HA core version 2026.8.x eliminates merged devices, the system automatically splits them into separate integrations. This can (will) cause a conflict for any automations and scripts that might use your ZHA device ID. Things like device trigger actions, event triggers, and button presses, especially. If you update to 2026.8, you will receive repair warnings. You need to tell the system which device ID to use in your automations and scripts. These are manual repairs. There are also some repairs that may only appear in the system log (like some event triggers).
+
+An easier workaround may be to temporarily remove the ZHA Device Info integration (which removes the conflicts that need repairs), update to 2026.8+, then set up the ZHA Device Info integration again. The devices will be split, and your automations and scripts won't need any repairing.
+
+---
+
 # zha-device-info
 ZHA zigbee device info as sensors in HA
 
