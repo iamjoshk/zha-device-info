@@ -33,6 +33,13 @@ async def async_setup_entry(
             _LOGGER.error("ZHA gateway not found")
             return
 
+        zha_config_entry = getattr(zha_data, "config_entry", None)
+        if zha_config_entry is None:
+            _LOGGER.error("ZHA config entry not found")
+            return
+
+        zha_config_entry_id = zha_config_entry.entry_id
+
         device_registry = async_get(hass)
         
         entities = []
@@ -51,7 +58,7 @@ async def async_setup_entry(
                 for conf, conf_data in binary_sensor_configs.items():
                     if entry.options.get(conf, DEFAULT_OPTIONS[conf]):
                         entity = ZHADeviceBinarySensor(
-                            hass, device, device_registry, conf_data
+                            hass, device, device_registry, zha_config_entry_id, conf_data
                         )
                         entities.append(entity)
                 
@@ -70,12 +77,13 @@ async def async_setup_entry(
 class ZHADeviceBinarySensor(BinarySensorEntity):
     """Binary sensor for ZHA device attributes."""
 
-    def __init__(self, hass, device, device_registry, conf_data):
+    def __init__(self, hass, device, device_registry, zha_config_entry_id, conf_data):
         """Initialize the binary sensor."""
         self._device = device
         self._conf_data = conf_data
-        device_entry = device_registry.async_get_device(
-            identifiers={(ZHA_DOMAIN, str(device.ieee))},
+        device_entry = device_registry.async_get_device_by_identifier(
+            (ZHA_DOMAIN, str(device.ieee)),
+            zha_config_entry_id,
         )
         device_name = device_entry.name_by_user if device_entry and device_entry.name_by_user else device.name
         

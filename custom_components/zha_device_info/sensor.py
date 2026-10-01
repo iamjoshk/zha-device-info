@@ -6,7 +6,6 @@ from datetime import datetime
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.util import dt as dt_util
-from homeassistant.components import zha
 from homeassistant.components.zha.const import DOMAIN as ZHA_DOMAIN
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -42,6 +41,13 @@ async def async_setup_entry(
 
         if DOMAIN not in hass.data:
             hass.data[DOMAIN] = {"entities": []}
+
+        zha_config_entry = getattr(zha_data, "config_entry", None)
+        if zha_config_entry is None:
+            _LOGGER.error("ZHA config entry not found")
+            return
+
+        zha_config_entry_id = zha_config_entry.entry_id
         
         device_registry = async_get(hass)
         
@@ -49,10 +55,11 @@ async def async_setup_entry(
         for device in zha_data.gateway_proxy.gateway.devices.values():
             if device is None:
                 continue
-                
+
             try:
+                # Create and append entities...
                 # Add main sensor
-                main_entity = ZHADeviceInfoSensor(hass, device, device_registry)
+                main_entity = ZHADeviceInfoSensor(hass, device, device_registry, zha_config_entry_id)
                 entities.append(main_entity)
                 
                 # Add split attribute sensors based on config
@@ -62,15 +69,19 @@ async def async_setup_entry(
                         if conf_data.get("platform") == "binary_sensor":
                             continue
                         entity = ZHADeviceAttributeSensor(
-                            hass, device, device_registry, conf_data
+                            hass, device, device_registry, zha_config_entry_id, conf_data
                         )
                         entities.append(entity)
                         
-                hass.data[DOMAIN]["entities"].extend(entities)
                 
             except Exception as entity_err:
-                _LOGGER.exception("Error creating sensor for device %s: %s", device.name, entity_err)
+                _LOGGER.exception(
+                    "Error creating sensor for device %s: %s",
+                    device.name,
+                    entity_err,
+                )
 
+        hass.data[DOMAIN]["entities"].extend(entities)
         async_add_entities(entities, True)
         _LOGGER.debug("ZHA Device Info sensors setup complete")
     except Exception as err:
@@ -82,12 +93,13 @@ class ZHADeviceInfoSensor(SensorEntity):
 
     _attr_should_poll = False
     
-    def __init__(self, hass: HomeAssistant, device, device_registry) -> None:
+    def __init__(self, hass, device, device_registry, zha_config_entry_id):
         """Initialize the sensor."""
         self._device = device
         # Look up device using ZHA domain identifiers
-        device_entry = device_registry.async_get_device(
-            identifiers={(ZHA_DOMAIN, str(device.ieee))},
+        device_entry = device_registry.async_get_device_by_identifier(
+            (ZHA_DOMAIN, str(device.ieee)),
+            zha_config_entry_id,
         )
         _LOGGER.debug("Device entry from registry: %s", device_entry)
         _LOGGER.debug("Device entry name_by_user: %s", device_entry.name_by_user if device_entry else None)
@@ -162,12 +174,15 @@ class ZHADeviceInfoSensor(SensorEntity):
 class ZHADeviceAttributeSensor(SensorEntity):
     """Representation of a ZHA Device attribute sensor."""
 
-    def __init__(self, hass, device, device_registry, conf_data):
+    def __init__(
+        self, hass, device, device_registry, zha_config_entry_id, conf_data
+    ):        
         """Initialize the sensor."""
         self._device = device
         self._conf_data = conf_data
-        device_entry = device_registry.async_get_device(
-            identifiers={(ZHA_DOMAIN, str(device.ieee))},
+        device_entry = device_registry.async_get_device_by_identifier(
+            (ZHA_DOMAIN, str(device.ieee)),
+            zha_config_entry_id,
         )
         device_name = device_entry.name_by_user if device_entry and device_entry.name_by_user else device.name
         
