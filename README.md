@@ -11,10 +11,11 @@ An easier workaround may be to temporarily remove the ZHA Device Info integratio
 # zha-device-info
 ZHA zigbee device info as sensors in HA
 
-## version 0.3.1
-Added translation strings
+## version 0.3.2
+Fix for the changes in the HA device registry
 
 ### Past versions
+- v0.3.1 - added translation strings
 - v0.3.0 - made custom integration HACS compatible
 - v0.2.0 - Moved ZHA Device Info entities into their corresponding devices in the ZHA integration.
 - v0.1.0 - Initial creation and testing
